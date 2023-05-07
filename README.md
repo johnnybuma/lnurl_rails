@@ -1,24 +1,30 @@
-# README
+# Rails 7 Boilerplate App
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is a boilerplate Rails 7 application using bootstrap 5 for styling and devise for authentication.
 
-Things you may want to cover:
+To get started in development begin with the following:
+* Install ruby 3.0.0 and create a project gemset called rails7
+```
+rvm use 3.0.0@rails7 --create
+```
 
-* Ruby version
+* Install all dependencies
 
-* System dependencies
+```
+bundle install
+yarn install
+rails generate devise:install
+```
 
-* Configuration
+* Set-up database
+```
+rails db:setup
 
-* Database creation
+rails db:migrate
+```
 
-* Database initialization
+* Start application
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```
+./bin/dev
+```
