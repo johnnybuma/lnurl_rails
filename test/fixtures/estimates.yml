@@ -1,0 +1,75 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  title: MyString
+  user: one
+  contact: one
+  engineer: MyString
+  architect: MyString
+  reference_date: 2022-04-13 14:33:23
+  date_submitted: 2022-04-13 14:33:23
+  estimate_type: MyString
+  labor_rate: 9.99
+  labor_lost_time: 9.99
+  labor_overhead: 9.99
+  tax_rate: 9.99
+  markup_rate: 9.99
+  cdb_rate: 9.99
+  sqft: 1
+  sqft_cost: 9.99
+  raw_material_total: 9.99
+  material_tax_total: 9.99
+  material_markup_total: 9.99
+  material_total: 9.99
+  total_hours: 9.99
+  raw_labor_total: 9.99
+  lost_time_total: 9.99
+  labor_overhead_total: 9.99
+  labor_total: 9.99
+  material_labor_total: 9.99
+  material_labor_cdb: 9.99
+  material_labor_cdb_total: 9.99
+  estimate_description: MyText
+  approved: false
+  generate: false
+  gear_package: 9.99
+  fixture_package: 9.99
+  controls_package: 9.99
+  project: one
+
+two:
+  title: MyString
+  user: two
+  contact: two
+  engineer: MyString
+  architect: MyString
+  reference_date: 2022-04-13 14:33:23
+  date_submitted: 2022-04-13 14:33:23
+  estimate_type: MyString
+  labor_rate: 9.99
+  labor_lost_time: 9.99
+  labor_overhead: 9.99
+  tax_rate: 9.99
+  markup_rate: 9.99
+  cdb_rate: 9.99
+  sqft: 1
+  sqft_cost: 9.99
+  raw_material_total: 9.99
+  material_tax_total: 9.99
+  material_markup_total: 9.99
+  material_total: 9.99
+  total_hours: 9.99
+  raw_labor_total: 9.99
+  lost_time_total: 9.99
+  labor_overhead_total: 9.99
+  labor_total: 9.99
+  material_labor_total: 9.99
+  material_labor_cdb: 9.99
+  material_labor_cdb_total: 9.99
+  estimate_description: MyText
+  approved: false
+  generate: false
+  gear_package: 9.99
+  fixture_package: 9.99
+  controls_package: 9.99
+  project: two

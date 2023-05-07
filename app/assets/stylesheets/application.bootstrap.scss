@@ -1,0 +1,177 @@
+
+$h1-font-size: 1.5rem; // this line was added
+
+.sticky-top {
+  width: 100px;
+}
+
+@media (min-width: 576px) {
+  .h-sm-100 {
+    height: 100%;
+  }
+
+  nav.navbar {
+
+  }
+  .chat-room {
+    height: 60vh;
+
+  }
+
+
+  #main-content {
+    width: 90vw;
+    height: 100vh;
+    max-height: 100vh;
+    overflow-y: scroll;
+    position: absolute;
+    top: 0;
+    margin-left: 10vw;
+  }
+
+  #navigation-sidebar {
+    width: 10vw;
+  }
+
+
+
+}
+
+@media (max-width: 576px) {
+  .sticky-top {
+    max-height: 50px !important;
+  }
+  .chat-room {
+    height: 60vh;
+  }
+  .msg-form {
+    position: fixed;
+    bottom: 30px;
+  }
+}
+
+.row > * {
+  flex-shrink: 100 !important;
+}
+
+.container-margined {
+  padding: 20px;
+}
+
+.navbar-brand {
+  color: white !important;
+  padding-left: 10px;
+}
+.nav-item {
+  color: white !important;
+  padding-right: 10px;
+}
+
+
+.chat-room {
+  //overflow-y: scroll;
+  width: 100%;
+  //margin-top: 60px;
+  //margin-bottom: 30px;
+  background-color: whitesmoke;
+  padding: 10px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column-reverse;
+  .message {
+    min-height: 59px;
+    .content-container {
+      display: inline-block;
+      .content {
+        background-color: #eeeeee;
+        padding: 8px 16px;
+        border-radius: 20px;
+      }
+      .author {
+        font-size: 0.8rem;
+        color: #777777;
+        margin-left: 10px;
+      }
+
+    }
+  &.me {
+    .content-container {
+      float: right;
+      .content {
+        background-color: #0d6efd;
+        color: white;
+      }
+    }
+  }
+  }
+  .chat-box {
+    position: fixed;
+    //z-index: 1;
+    bottom: 0;
+    padding: 20px;
+    width: 80%;
+    input[type=text] {
+      height: 45px;
+      font-size: 20px;
+      padding: 8px;
+    }
+    .btn {
+      height: 45px;
+    }
+  }
+}
+
+#navigation-wrapper {
+  max-height: 100vh;
+  position: fixed;
+  z-index: 10000;
+
+}
+
+.modal {
+}
+
+.alert {
+
+}
+
+
+
+.container-margined {
+  margin-left: 17%;
+}
+
+#offCanvasToggleBtn {
+  position: fixed;
+  top: 0;
+  right: 0;
+}
+
+#chat-fixed {
+  position: fixed;
+  top: 10px;
+}
+
+
+#edit_estimate_modal_dialog {
+  max-width: 50vw;
+}
+
+#sign_in_form {
+  //margin-top: 20px !important;
+}
+
+tr.items_row > td {
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  input {
+    border-radius: 0;
+  }
+}
+
+@import "estimates";
+
+@import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-icons/font/bootstrap-icons';
+

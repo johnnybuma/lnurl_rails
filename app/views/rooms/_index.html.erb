@@ -1,0 +1,27 @@
+<%= turbo_stream_from "rooms" %>
+<div id="rooms">
+  <% Room.all.each do |room| %>
+    <%= link_to room, remote: true, class: '' do %>
+      <span class="d-none d-sm-inline"><%= room.name %></span> <%= room.id.to_s %>
+    <% end %>
+  <% end %>
+  <hr>
+  <a type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    New Room
+  </a>
+</div>
+<div class="row">
+  <div class="col-12">
+    <% if @single_room %>
+      <div class="chat-room">
+        <%= turbo_stream_from @single_room %>
+        <div id="messages">
+          <%= render @messages %>
+        </div>
+      </div>
+      <div class="chat-box">
+        <%= render partial: 'layouts/new_message_form' %>
+      </div>
+    <% end %>
+  </div>
+</div>

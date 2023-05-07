@@ -1,0 +1,41 @@
+<%= turbo_frame_tag 'rooms' do %>
+  <%= turbo_stream_from "rooms" %>
+  <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+    <a type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      New Room
+    </a>
+    <div class="btn-group" role="group">
+      <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+        Chatrooms
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <% Room.all.each do |room| %>
+          <li>
+            <%= link_to room, remote: true, class: 'dropdown-item' do %>
+              <%= room.name %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <% if @single_room %>
+        <nav class="navbar navbar-brand">
+          <h1 class="text-black"><%= @single_room.name %></h1>
+        </nav>
+        <div class="chat-room">
+          <%= turbo_stream_from @single_room %>
+          <div id="messages">
+            <%= render @messages %>
+          </div>
+        </div>
+        <div class="chat-box">
+          <%= render partial: 'layouts/new_message_form' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
