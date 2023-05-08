@@ -5,11 +5,6 @@ class ApplicationController < ActionController::Base
   before_action :authenticate_user! # Routes to the login / signup if not authenticated
 
 
-
-  @new_room = Room.new
-
-
-
   protected
 
   def configure_permitted_parameters

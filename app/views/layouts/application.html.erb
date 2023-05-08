@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>PRI2M</title>
+    <title>NodeVeiw</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= favicon_link_tag 'SYMBOLIC.png' %>
     <%= csrf_meta_tags %>
@@ -47,7 +47,9 @@
                 </div>
               <% end %>
             </div>
-            <%= yield %>
+            <div class="main-padding">
+              <%= yield %>
+            </div>
           </main>
           <footer class="row bg-light py-4 mt-auto">
             <div class="col"> I will leave this for now for future content here... </div>

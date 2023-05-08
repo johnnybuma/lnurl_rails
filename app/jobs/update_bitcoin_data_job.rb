@@ -1,11 +1,11 @@
-class HomeController < ApplicationController
+class UpdateBitcoinDataJob < ApplicationJob
+  queue_as :default
 
   require 'bitcoin_core_rpc'
+  include ActionView::RecordIdentifier
 
 
-
-  def index
-
+  def perform
     rpc_url = "http://192.168.1.26:8332"
     rpc_user = "bitcoin"
     rpc_password = "hotrod212"
@@ -14,20 +14,7 @@ class HomeController < ApplicationController
 
     @blockchain_info = bitcoin.get_blockchain_info["result"].to_a
 
-
-
-
-
-    @block_count = bitcoin.get_block_count
-
-    UpdateBitcoinDataJob.perform_now
-
-    ActionCable.server.broadcast "bitcoin_data_channel", @blockchain_info
-
-
+    ActionCable.server.broadcast'bitcoin_data', @blockchain_info
 
   end
-
-
-
 end

@@ -1,0 +1,9 @@
+:queues:
+  - default
+:scheduler:
+  :schedule:
+    enabled_job:
+      enabled: true
+      cron: "*/60 * * * *"
+      class: "UpdateBitcoinDataJob"
+      queue: default

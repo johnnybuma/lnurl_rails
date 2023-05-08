@@ -6,7 +6,6 @@ class User < ApplicationRecord
   after_initialize :set_default_role, :if => :new_record?
   has_one_attached :avatar
 
-  has_many :messages
 
   validates_uniqueness_of :username
   scope :all_except, ->(user) { where.not(id: user) }

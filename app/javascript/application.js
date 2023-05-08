@@ -12,29 +12,18 @@ let popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
 import "./channels"
 
 
-document.addEventListener('turbo:frame-load', function () {
 
-    const form = document.getElementById('message-form');
-    console.log(form);
-    if (form) {
-        form.addEventListener('submit', function handleSubmit(event) {
-            event.preventDefault();
-            // 👇️ Send data to server here
-            form.submit();
-            // 👇️ Reset form here
-            form.reset();
-            console.log("form was reset!");
-        });
+document.addEventListener("turbo:before-stream-render", (event) => {
+
+    const targetElement = document.getElementById(event.target.id);
+    if (targetElement) {
+        targetElement.classList.add("flash-bg");
+        console.log('the script is working');
+
+        setTimeout(() => {
+            targetElement.classList.remove("flash-bg");
+        }, 1000);
     }
-
-    function drag(ev) {
-        ev.dataTransfer.setData("text", ev.target.id);
-    }
-
-    function drop(ev) {
-        ev.preventDefault();
-        var data = ev.dataTransfer.getData("text");
-        ev.target.appendChild(document.getElementById(data));
-    }
-
 });
+
+

@@ -1,3 +1,7 @@
-<h1>This is my test homepage</h1>
+<h1>Bitcoin RPC Explorer</h1>
 <hr>
-<div id="room-id" data-room-id="1"></div>
+<%= turbo_stream_from 'bitcoin_data' %>
+    <div id="bitcoin_data" class="flash-bg">
+      <%= render 'bitcoin_data', blockchain_info: @blockchain_info %>
+  </div>
+

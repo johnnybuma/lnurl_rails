@@ -1,6 +1,23 @@
 
 $h1-font-size: 1.5rem; // this line was added
 
+
+
+
+.flash-bg {
+  animation: flashBackground 1s ease-out;
+}
+
+@keyframes flashBackground {
+  0% {
+    background-color: #cce5ff;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+
 .sticky-top {
   width: 100px;
 }
@@ -170,7 +187,6 @@ tr.items_row > td {
   }
 }
 
-@import "estimates";
 
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';

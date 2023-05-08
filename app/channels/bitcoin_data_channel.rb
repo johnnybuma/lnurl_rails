@@ -1,7 +1,7 @@
-class RoomChannel < ApplicationCable::Channel
+class BitcoinDataChannel < ApplicationCable::Channel
   def subscribed
     # stream_from "some_channel"
-    stream_from "room_channel_#{params[:room_id]}"
+    stream_from "bitcoin_data_channel"
   end
 
   def unsubscribed

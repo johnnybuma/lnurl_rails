@@ -6,7 +6,7 @@ require "rails/all"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-module Prism2
+module LnUrlRails
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
@@ -21,7 +21,7 @@ module Prism2
     #
 
     config.active_record.cache_versioning = false
-    config.cache_store = :redis_store, "redis://localhost:6379/0/cache", { expires_in: 90.minutes }
+    config.cache_store = :redis_store, "redis://localhost:6379/0/cache", { expires_in: 1.minutes }
     config.active_job.queue_adapter = :sidekiq
 
   end

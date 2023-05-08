@@ -1,0 +1,35 @@
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+
+<% blockchain_info.each do |key, value| %>
+  <div class="col">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title"><%= key.capitalize.gsub('_', ' ') %></h5>
+        <% if value.is_a?(Array) %>
+          <table class="table">
+            <thead>
+            <tr>
+              <% value.first.keys.each do |nested_key| %>
+                <th scope="col"><%= nested_key.capitalize.gsub('_', ' ') %></th>
+              <% end %>
+            </tr>
+            </thead>
+            <tbody>
+            <% value.each do |nested_value| %>
+              <tr>
+                <% nested_value.values.each do |nested_data| %>
+                  <td><%= nested_data %></td>
+                <% end %>
+              </tr>
+            <% end %>
+            </tbody>
+          </table>
+
+        <% else %>
+          <p class="card-text"><%= value %></p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+</div>
