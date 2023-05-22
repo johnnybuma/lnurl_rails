@@ -72,6 +72,8 @@ gem 'bitcoin_core_rpc', git: 'https://github.com/johnnybuma/bitcoin_core_rpc.git
 
 gem 'sidekiq-scheduler'
 
+gem 'daemons'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri mingw x64_mingw ]

@@ -21,8 +21,15 @@ module LnUrlRails
     #
 
     config.active_record.cache_versioning = false
-    config.cache_store = :redis_store, "redis://localhost:6379/0/cache", { expires_in: 1.minutes }
+    config.cache_store = :redis_store, "redis://localhost:6379/0/cache", { expires_in: 90.minutes }
     config.active_job.queue_adapter = :sidekiq
+
+
+    config.after_initialize do
+      #Uncomment before sending to Heroku!!!
+      #system ("RAILS_ENV=development ruby daemon_start.rb start")
+      #puts "<------------------It should be running----------------------->"
+    end
 
   end
 end

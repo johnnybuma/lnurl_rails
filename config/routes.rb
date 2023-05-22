@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :chain_data
 
   devise_for :users
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
@@ -15,7 +16,7 @@ Rails.application.routes.draw do
   #devise_for :users
   resources :users
 
-  root to: "home#index"
+  root to: "chain_data#index"
 
 
   mount ActionCable.server => '/cable'

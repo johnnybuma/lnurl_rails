@@ -13,7 +13,7 @@ import "./channels"
 
 
 
-document.addEventListener("turbo:before-stream-render", (event) => {
+document.addEventListener("turbo:load", (event) => {
 
     const targetElement = document.getElementById(event.target.id);
     if (targetElement) {

@@ -1,0 +1,9 @@
+<h1>Bitcoin RPC Explorer</h1>
+<hr>
+<%= turbo_frame_tag @chain_data do %>
+<%= turbo_stream_from 'chain_data_channel' %>
+  <div id="chain_data">
+    <%= render 'chain_data', chain_data: @chain_data %>
+  </div>
+
+<% end %>

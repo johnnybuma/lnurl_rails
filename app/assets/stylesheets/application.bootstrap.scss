@@ -2,10 +2,13 @@
 $h1-font-size: 1.5rem; // this line was added
 
 
-
+.main-padding {
+  margin: 20px;
+  padding: 20px;
+}
 
 .flash-bg {
-  animation: flashBackground 1s ease-out;
+  animation: flashBackground 5s ease-out;
 }
 
 @keyframes flashBackground {

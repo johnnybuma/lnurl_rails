@@ -1,9 +1,5 @@
-:queues:
-  - default
 :scheduler:
   :schedule:
-    enabled_job:
-      enabled: true
-      cron: "*/60 * * * *"
-      class: "UpdateBitcoinDataJob"
-      queue: default
+    UpdateChainData:
+      class: 'UpdateChainDataJob'
+      cron: '* * * * *' # Runs when second = 0

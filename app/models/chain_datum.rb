@@ -1,0 +1,5 @@
+class ChainDatum < ApplicationRecord
+
+
+
+end

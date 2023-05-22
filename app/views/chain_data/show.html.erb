@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @chain_datum %>
+
+<div>
+  <%= link_to "Edit this chain datum", edit_chain_datum_path(@chain_datum) %> |
+  <%= link_to "Back to chain data", chain_data_path %>
+
+  <%= button_to "Destroy this chain datum", @chain_datum, method: :delete %>
+</div>

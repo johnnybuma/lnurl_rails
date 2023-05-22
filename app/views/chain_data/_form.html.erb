@@ -1,0 +1,17 @@
+<%= form_with(model: chain_datum) do |form| %>
+  <% if chain_datum.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(chain_datum.errors.count, "error") %> prohibited this chain_datum from being saved:</h2>
+
+      <ul>
+        <% chain_datum.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>
