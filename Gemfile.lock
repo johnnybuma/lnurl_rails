@@ -337,6 +337,7 @@ GEM
 
 PLATFORMS
   x86_64-darwin-21
+  x86_64-darwin-22
 
 DEPENDENCIES
   aws-sdk-rails (~> 3)
@@ -358,7 +359,7 @@ DEPENDENCIES
   passenger (~> 6.0.12)
   pg (~> 1.1)
   puma (~> 5.0)
-  rails (~> 7.0.0)
+  rails (~> 7.0.4.3)
   redis (~> 4.6)
   redis-rails
   redis-store
@@ -376,7 +377,7 @@ DEPENDENCIES
   wkhtmltopdf-binary
 
 RUBY VERSION
-   ruby 3.0.0p0
+   ruby 3.2.2p53
 
 BUNDLED WITH
    2.2.3
