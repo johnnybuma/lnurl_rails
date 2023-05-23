@@ -7,7 +7,7 @@ class ChainDataController < ApplicationController
   # GET /chain_data or /chain_data.json
   def index
 
-    rpc_url = "http://192.168.1.26:8332"
+    rpc_url = "http://localhost:8332"
     rpc_user = "bitcoin"
     rpc_password = "hotrod212"
 

@@ -27,8 +27,12 @@ module LnUrlRails
 
     config.after_initialize do
       #Uncomment before sending to Heroku!!!
-      #system ("RAILS_ENV=development ruby daemon_start.rb start")
-      #puts "<------------------It should be running----------------------->"
+      if Rails.env.production?
+        system ("RAILS_ENV=development ruby daemon_start.rb start")
+        puts "<------------------It should be running----------------------->"
+      else
+        puts "The Environment loaded is in Development..."
+      end
     end
 
   end
