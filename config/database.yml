@@ -82,7 +82,7 @@ test:
 production:
   adapter: postgresql
   encoding: unicode
-  database: rails7_production
+  database: nodeview_production
   pool: 5
-  username: rails7
-  password: <%= ENV["RAILS7_DATABASE_PASSWORD"] %>
+  username: nodeview
+  password: <%= ENV["NODEVIEW_DATABASE_PASSWORD"] %>

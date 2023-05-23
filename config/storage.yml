@@ -10,6 +10,6 @@ minio:
   access_key_id: <%= ENV["MINIO_ROOT_USER"] %>
   secret_access_key: <%= ENV["MINIO_ROOT_PASSWORD"] %>
   region: us-east-1
-  bucket: rails7-bucket
-  endpoint: "https://your.domain.com:9000"
+  bucket: nodeview-bucket
+  endpoint: "https://www.nodeview.app:9000"
   force_path_style: true
