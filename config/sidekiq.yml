@@ -1,5 +1,0 @@
-:scheduler:
-  :schedule:
-    UpdateChainData:
-      class: 'UpdateChainDataJob'
-      cron: '* * * * *' # Runs when second = 0
