@@ -7,9 +7,9 @@ class ChainDataController < ApplicationController
   # GET /chain_data or /chain_data.json
   def index
 
-    rpc_url = "http://localhost:8332"
-    rpc_user = "bitcoin"
-    rpc_password = "hotrod212"
+    rpc_url = ENV['BITCOIN_RPC_URL']
+    rpc_user = ENV['BITCOIN_RPC_USERNAME']
+    rpc_password = ENV['BITCOIN_RPC_PASSWORD']
 
     bitcoin = BitcoinCoreRpc::API.new(rpc_url, rpc_user, rpc_password)
 

@@ -5,7 +5,11 @@
     </a>
     <ul class="nav nav-pills flex-sm-column flex-row flex-nowrap flex-shrink-1 flex-sm-grow-0 flex-grow-1 mb-sm-auto mb-0 justify-content-center align-items-center align-items-sm-start" id="menu">
       <% if user_signed_in? %>
-
+        <li>
+          <%= link_to root_path, class: 'nav-link px-sm-0 px-2' do %>
+            <i class="fs-5 bi-currency-bitcoin"></i><span class="ms-1 d-none d-sm-inline">Blockchain</span> </a>
+          <% end %>
+        </li>
 
 
     </ul>

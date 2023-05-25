@@ -3,8 +3,12 @@ $h1-font-size: 1.5rem; // this line was added
 
 
 .main-padding {
-  margin: 20px;
-  padding: 20px;
+  
+  @media screen and (min-width: 768px) {
+    margin: 20px;
+    padding: 20px;
+  }
+
 }
 
 .flash-bg {
