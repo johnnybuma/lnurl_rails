@@ -5,7 +5,9 @@
     <div class="card h-100">
       <div class="card-body">
         <h5 class="card-title"><%= key.capitalize.gsub('_', ' ') %></h5>
-        <% if value.is_a?(Array) %>
+        <% if value.is_a?(Hash)
+             value = value.to_a
+        %>
           <table class="table">
             <thead>
             <tr>

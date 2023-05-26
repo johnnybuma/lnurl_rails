@@ -3,6 +3,7 @@ class ChainDataController < ApplicationController
 
   require 'bitcoin_core_rpc'
 
+  require 'json'
 
   # GET /chain_data or /chain_data.json
   def index
