@@ -5,9 +5,31 @@
     <div class="card h-100">
       <div class="card-body">
         <h5 class="card-title"><%= key.capitalize.gsub('_', ' ') %></h5>
-
-
+        <% if value.is_a?(Hash) %>
+          <table class="table">
+            <% value.each do |bip| %>
+              <tr>
+                <th>
+                  <%= bip[0] %>
+                </th>
+                <td>
+                  <% bip[1].to_a.each do |detail| %>
+                  <tr>
+                    <td>
+                      <%= detail[0] %>
+                    </td>
+                    <td>
+                      <%= detail[1] %>
+                    </td>
+                  </tr>
+                <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </table>
+        <% else %>
           <p class="card-text" id="<%= key.to_s.downcase %>"><%= value %></p>
+        <% end %>
       </div>
     </div>
   </div>
