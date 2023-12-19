@@ -6,9 +6,17 @@
     document.addEventListener('turbo:frame-load', function (event) {
         if (event.target.id === 'block_chart') {
             var rawData = <%= @chart_data.to_json.html_safe %>;
+
             if (rawData && rawData.length > 0) {
-                var difficultyData = rawData.map(function(item) { return [item.block_number, parseFloat(item.difficulty)]; });
-                var chainworkData = rawData.map(function(item) { return [item.block_number, parseFloat(item.chainwork)]; });
+                var difficultyData = rawData.map(function(item) {
+                    return [item.block_number, parseFloat(item.difficulty)];
+                });
+                var chainworkData = rawData.map(function(item) {
+                    return [item.block_number, parseFloat(item.chainwork)];
+                });
+
+                // Debug: Log the difficultyData to inspect its structure
+                console.log(difficultyData);
 
                 Highcharts.chart('difficulty-chainwork-chart', {
                     chart: {
@@ -47,3 +55,4 @@
         }
     });
 </script>
+
