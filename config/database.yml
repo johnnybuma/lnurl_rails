@@ -84,5 +84,5 @@ production:
   encoding: unicode
   database: lnurl_rails_production
   pool: 5
-  username: lnurl_rails
+  username: nodeview
   password: <%= ENV["LNURL_RAILS_DATABASE_PASSWORD"] %>
