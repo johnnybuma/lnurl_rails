@@ -1,62 +1,16 @@
 <!-- app/views/block_histories/index.html.erb -->
-
-<%= turbo_frame_tag "block_chart" do %>
-  <%= form_with url: block_histories_path, method: :get, data: { turbo_frame: "block_chart" } do %>
-    <div>
-      <%= label_tag :start_block, 'Start Block' %>
-      <%= number_field_tag :start_block, params[:start_block], min: 0 %>
-    </div>
-    <div>
-      <%= label_tag :end_block, 'End Block' %>
-      <%= number_field_tag :end_block, params[:end_block], min: 0 %>
-    </div>
-    <%= submit_tag 'Show Chart' %>
-  <% end %>
-
-  <div id="difficulty-chainwork-chart" style="width:100%; height:400px;"></div>
+<%= form_with url: block_histories_path, method: :get, data: { turbo_frame: "block_chart" } do %>
+  <div>
+    <%= label_tag :start_block, 'Start Block' %>
+    <%= number_field_tag :start_block, params[:start_block], min: 0 %>
+  </div>
+  <div>
+    <%= label_tag :end_block, 'End Block' %>
+    <%= number_field_tag :end_block, params[:end_block], min: 0 %>
+  </div>
+  <%= submit_tag 'Show Chart' %>
 <% end %>
 
-<script>
-    document.addEventListener('turbo:load', function () {
-        var rawData = <%= @chart_data.to_json.html_safe %>;
-
-        if (rawData && rawData.length > 0) {
-            var difficultyData = rawData.map(function(item) { return [item.block_number, parseFloat(item.difficulty)]; });
-            var chainworkData = rawData.map(function(item) { return [item.block_number, parseFloat(item.chainwork)]; });
-
-            Highcharts.chart('difficulty-chainwork-chart', {
-                chart: {
-                    type: 'line'
-                },
-                title: {
-                    text: 'Difficulty vs Chainwork'
-                },
-                xAxis: {
-                    title: {
-                        text: 'Block Number'
-                    }
-                },
-                yAxis: [{
-                    title: {
-                        text: 'Difficulty'
-                    }
-                }, {
-                    title: {
-                        text: 'Chainwork'
-                    },
-                    opposite: true
-                }],
-                series: [{
-                    name: 'Difficulty',
-                    data: difficultyData
-                }, {
-                    name: 'Chainwork',
-                    yAxis: 1,
-                    data: chainworkData
-                }]
-            });
-        } else {
-            console.error('No data available for chart.');
-        }
-    });
-</script>
+<%= turbo_frame_tag "block_chart" do %>
+  <%= render 'chart' %>
+<% end %>

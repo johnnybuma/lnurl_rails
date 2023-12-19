@@ -11,8 +11,8 @@ class BlockHistoriesController < ApplicationController
         data = JSON.parse(block_history.data)
         {
           block_number: block_history.block_number,
-          difficulty: data['difficulty'].to_f,  # Assumes 'difficulty' is a top-level key
-          chainwork: data['chainwork'].to_f     # Assumes 'chainwork' is a top-level key
+          difficulty: data['result']['difficulty'].to_f,  # Assumes 'difficulty' is a top-level key
+          chainwork: data['result']['chainwork'].to_f     # Assumes 'chainwork' is a top-level key
         }
       rescue JSON::ParserError, TypeError
         # Handle JSON parsing errors or return a default structure
