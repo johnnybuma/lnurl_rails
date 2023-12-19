@@ -1,0 +1,2 @@
+class BlockDatum < ApplicationRecord
+end
