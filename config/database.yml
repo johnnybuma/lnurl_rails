@@ -86,3 +86,5 @@ production:
   pool: 5
   username: nodeview
   password: <%= ENV["LNURL_RAILS_DATABASE_PASSWORD"] %>
+
+#I had to change something I guess
