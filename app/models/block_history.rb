@@ -1,0 +1,2 @@
+class BlockHistory < ApplicationRecord
+end
