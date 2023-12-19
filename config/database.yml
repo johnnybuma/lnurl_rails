@@ -85,4 +85,5 @@ production:
   database: lnurl-rails_production
   pool: 5
   username: lnurl-rails
-  password: <%= ENV["LNURL-RAILS_DATABASE_PASSWORD"] %>
+  password: <%= ENV["LNURL_RAILS_DATABASE_PASSWORD"] %>
+ß
