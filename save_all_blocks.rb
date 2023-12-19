@@ -1,5 +1,7 @@
 require File.expand_path('../config/environment', __FILE__)
 require 'bitcoin_core_rpc'
+require 'json'
+
 
 rpc_url = ENV['BITCOIN_RPC_URL']
 rpc_user = ENV['BITCOIN_RPC_USERNAME']
@@ -23,7 +25,7 @@ cumulative_data_size = 0
 
 (start_block..current_block_count).each do |block_number|
   block_hash = bitcoin.get_block_hash(block_number)
-  block_data = bitcoin.get_block(block_hash)
+  block_data = bitcoin.get_block(block_hash["result"].to_s)
   block_data_json = block_data.to_json
 
   # Calculate the size of the current block data in bytes
@@ -33,7 +35,7 @@ cumulative_data_size = 0
   # Save block data to the BlockHistory model
   BlockHistory.create(
     block_number: block_number,
-    block_hash: block_hash,
+    block_hash: block_hash["result"].to_s,
     data: block_data_json
   )
 

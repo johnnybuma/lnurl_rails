@@ -358,6 +358,7 @@ DEPENDENCIES
   httparty
   jbuilder
   jsbundling-rails
+  json
   lnurl
   passenger (~> 6.0.12)
   pg (~> 1.1)

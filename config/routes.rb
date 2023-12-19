@@ -16,6 +16,8 @@ Rails.application.routes.draw do
   #devise_for :users
   resources :users
 
+  resources :block_histories
+
   root to: "chain_data#index"
 
 
