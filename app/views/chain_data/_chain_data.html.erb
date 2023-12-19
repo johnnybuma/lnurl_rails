@@ -1,43 +1,34 @@
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-  <% chain_data.each do |key, value| %>
-    <div class="col">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title"><%= key.capitalize.gsub('_', ' ') %></h5>
-          <% if value.is_a?(Hash) %>
-            <table class="table">
-              <% value.each do |bip| %>
-                <tr>
-                  <th><%= bip[0] %></th>
-                  <td>
-                    <% bip[1].to_a.each do |detail| %>
-                      <table>
-                        <tr>
-                          <td><%= detail[0] %></td>
-                          <td><%= detail[1] %></td>
-                        </tr>
-                      </table>
-                    <% end %>
-                  </td>
-                </tr>
+<div class="container mt-4">
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+    <% chain_data.each do |key, value| %>
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-header">
+            <%= key.capitalize.gsub('_', ' ') %>
+          </div>
+          <div class="card-body">
+            <% if value.is_a?(Hash) %>
+              <% value.each do |sub_key, sub_value| %>
+                <h6 class="card-subtitle mb-2 text-muted"><%= sub_key %></h6>
+                <p class="card-text"><%= sub_value %></p>
               <% end %>
-            </table>
-          <% elsif key.to_s.downcase == 'verificationprogress' %>
-            <!-- Bootstrap Progress Bar for verificationprogress -->
-            <div class="progress" style="height: 20px;">
-              <div class="progress-bar" role="progressbar"
-                   style="width: <%= (value.to_f * 100).round(2) %>%;"
-                   aria-valuenow="<%= (value.to_f * 100).round(2) %>"
-                   aria-valuemin="0" aria-valuemax="100"
-                   id="<%= key.to_s.downcase %>_bar">
-                <%= (value.to_f * 100).round(2) %>%
+            <% elsif key.to_s.downcase == 'verificationprogress' %>
+              <!-- Bootstrap Progress Bar for verificationprogress -->
+              <div class="progress mb-2" style="height: 20px;">
+                <div class="progress-bar" role="progressbar"
+                     style="width: <%= (value.to_f * 100).round(2) %>%;"
+                     aria-valuenow="<%= (value.to_f * 100).round(2) %>"
+                     aria-valuemin="0" aria-valuemax="100"
+                     id="<%= key.to_s.downcase %>_bar">
+                  <%= (value.to_f * 100).round(2) %>%
+                </div>
               </div>
-            </div>
-          <% else %>
-            <p class="card-text" id="<%= key.to_s.downcase %>"><%= value %></p>
-          <% end %>
+            <% else %>
+              <p class="card-text"><%= value %></p>
+            <% end %>
+          </div>
         </div>
       </div>
-    </div>
-<% end %>
+    <% end %>
+  </div>
 </div>
