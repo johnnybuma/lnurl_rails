@@ -11,6 +11,6 @@ include ActionView::Helpers::AssetUrlHelper
 #user = CreateAdminService.new.call
 #puts 'CREATED ADMIN USER: ' << user.email
 
-User.create(email: "johnny.buma@gmail.com", username: "Johnny", password: 'hotrod212', role: 2)
+User.create(email: "test@mail.com", username: "Johnny", password: 'password', role: 2)
 
 
