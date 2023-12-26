@@ -2,7 +2,6 @@ require File.expand_path('../config/environment', __FILE__)
 require 'bitcoin_core_rpc'
 require 'json'
 
-
 rpc_url = ENV['BITCOIN_RPC_URL']
 rpc_user = ENV['BITCOIN_RPC_USERNAME']
 rpc_password = ENV['BITCOIN_RPC_PASSWORD']
@@ -10,11 +9,27 @@ rpc_password = ENV['BITCOIN_RPC_PASSWORD']
 bitcoin = BitcoinCoreRpc::API.new(rpc_url, rpc_user, rpc_password)
 
 # Fetch the current block count
-block_count_response = bitcoin.get_block_count
+begin
+  block_count_response = bitcoin.get_block_count
+rescue IO::TimeoutError
+  sleep(5) # Wait for 5 seconds before retrying
+  retry
+end
+
 current_block_count = block_count_response.is_a?(Hash) ? block_count_response["result"] : block_count_response
 
 # Replace this with the block number you want to start from
-start_block = 0
+if BlockHistory.any?
+  start_block = BlockHistory.last.block_number.to_i + 1
+  puts "Starting with block number: " + start_block.to_s
+  sleep 5
+else
+  start_block = 0
+  puts "No existing records found. Starting with block zero..."
+  sleep 10
+end
+
+
 
 if start_block > current_block_count
   puts "Start block number (#{start_block}) is greater than the current block count (#{current_block_count}). Exiting."
@@ -24,8 +39,15 @@ end
 cumulative_data_size = 0
 
 (start_block..current_block_count).each do |block_number|
-  block_hash = bitcoin.get_block_hash(block_number)
-  block_data = bitcoin.get_block(block_hash["result"].to_s)
+  begin
+    block_hash = bitcoin.get_block_hash(block_number)
+    block_data = bitcoin.get_block(block_hash["result"].to_s)
+  rescue IO::TimeoutError
+    puts "Encountered a timeout error. Waiting 5 Seconds to retry."
+    sleep(5) # Wait for 5 seconds before retrying
+    retry
+  end
+
   block_data_json = block_data.to_json
 
   # Calculate the size of the current block data in bytes

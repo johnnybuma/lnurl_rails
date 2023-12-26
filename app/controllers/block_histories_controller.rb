@@ -4,21 +4,28 @@ class BlockHistoriesController < ApplicationController
     start_block = params[:start_block].to_i
     end_block = params[:end_block].to_i
 
-    range = [end_block - start_block, 1].max
-    data_points = 1000 # This is the number of points you want to plot.
-    interval = [1, (range.to_f / data_points).ceil].max
-
+    # Fetch all block histories within the specified range
     @block_histories = BlockHistory
                          .where(block_number: start_block..end_block)
-                         .where('block_number % ? = 0', interval)
                          .order(:block_number)
 
-    @chart_data = @block_histories.pluck(:block_number, :data).map do |block_number, data_json|
-      data = JSON.parse(data_json)
+    # Initialize an empty array for chart data
+    chart_data = []
+
+    # Populate chart_data with only the necessary values
+    @block_histories.each do |block_history|
+      data = JSON.parse(block_history.data)
       response = data['result'] || {}
+
+      # Extract difficulty and number of transactions
       difficulty = response['difficulty'] || 0
-      chainwork = response['chainwork'] || 0
-      [block_number, difficulty.to_f, chainwork.to_f]
+      numtxs = response['nTx'] || 0
+
+      # Push the required data into the chart_data array
+      chart_data << [block_history.block_number, difficulty.to_f, numtxs.to_f]
     end
+
+    # Assign the prepared data to @chart_data for use in the view
+    @chart_data = chart_data
   end
 end

@@ -1,15 +1,30 @@
 <!-- app/views/block_histories/index.html.erb -->
-<%= form_with url: block_histories_path, method: :get, data: { turbo_frame: "block_chart" } do %>
-  <div>
-    <%= label_tag :start_block, 'Start Block' %>
-    <%= number_field_tag :start_block, params[:start_block], min: 0 %>
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <div class="card">
+        <div class="card-header">
+          Enter Block Range
+        </div>
+        <div class="card-body">
+          <%= form_with url: block_histories_path, method: :get, class: 'row g-3', data: { turbo_frame: "block_chart" } do %>
+            <div class="col-md-6">
+              <%= label_tag :start_block, 'Start Block', class: 'form-label' %>
+              <%= number_field_tag :start_block, params[:start_block], min: 0, class: 'form-control' %>
+            </div>
+            <div class="col-md-6">
+              <%= label_tag :end_block, 'End Block', class: 'form-label' %>
+              <%= number_field_tag :end_block, params[:end_block], min: 0, class: 'form-control' %>
+            </div>
+            <div class="col-12">
+              <%= submit_tag 'Show Chart', class: 'btn btn-primary' %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
   </div>
-  <div>
-    <%= label_tag :end_block, 'End Block' %>
-    <%= number_field_tag :end_block, params[:end_block], min: 0 %>
-  </div>
-  <%= submit_tag 'Show Chart' %>
-<% end %>
+</div>
 
 <%= turbo_frame_tag "block_chart" do %>
   <%= render 'chart' %>

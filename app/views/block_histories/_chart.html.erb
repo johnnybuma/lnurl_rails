@@ -1,20 +1,20 @@
 <!-- app/views/block_histories/_chart.html.erb -->
 
-<div id="difficulty-chainwork-chart" style="width:100%; height:400px;"></div>
+<div id="difficulty-numtxs-chart" style="width:100%; height:400px;"></div>
 <script>
     document.addEventListener('turbo:frame-load', function (event) {
         if (event.target.id === 'block_chart') {
             var chartData = <%= @chart_data.to_json.html_safe %>;
             if (chartData && chartData.length > 0) {
                 var difficultyData = chartData.map(function(item) { return [item[0], item[1]]; });
-                var chainworkData = chartData.map(function(item) { return [item[0], item[2]]; });
+                var numtxsData = chartData.map(function(item) { return [item[0], item[2]]; });
 
-                Highcharts.chart('difficulty-chainwork-chart', {
+                Highcharts.chart('difficulty-numtxs-chart', {
                     chart: {
                         zoomType: 'x'
                     },
                     title: {
-                        text: 'Difficulty vs Chainwork'
+                        text: 'Difficulty vs Number of Txs'
                     },
                     xAxis: {
                         type: 'block_number',
@@ -28,24 +28,37 @@
                         }
                     }, {
                         title: {
-                            text: 'Chainwork'
+                            text: 'Number of Txs'
                         },
                         opposite: true
                     }],
                     plotOptions: {
-                        line: {
+                        series: {
+                            turboThreshold: 0, // No limit on the number of data points
                             marker: {
                                 enabled: false
                             }
                         }
                     },
+                    tooltip: {
+                        shared: true,
+                        formatter: function () {
+                            var tooltipText = '<b>Block Number: ' + this.x + '</b><br/>';
+                            this.points.forEach(function(point) {
+                                tooltipText += point.series.name + ': ' + point.y + '<br/>';
+                            });
+                            return tooltipText;
+                        }
+                    },
                     series: [{
                         name: 'Difficulty',
-                        data: difficultyData
+                        data: difficultyData,
+                        zIndex: 1 // Ensure Difficulty is on top
                     }, {
-                        name: 'Chainwork',
-                        data: chainworkData,
-                        yAxis: 1
+                        name: 'Number Txs',
+                        data: numtxsData,
+                        yAxis: 1,
+                        zIndex: 0 // Lower zIndex for Number Txs
                     }]
                 });
             } else {
