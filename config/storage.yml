@@ -11,5 +11,5 @@ minio:
   secret_access_key: <%= ENV["MINIO_ROOT_PASSWORD"] %>
   region: us-east-1
   bucket: nodeview-bucket
-  endpoint: "https://www.nodeview.app:9000"
+  endpoint: "https://minioapi.nodeview.app"
   force_path_style: true
