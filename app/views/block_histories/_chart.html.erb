@@ -1,5 +1,7 @@
 <div id="difficulty-numtxs-chart" style="width:100%; height:400px;"></div>
-<button id="loadMore" class="btn btn-primary mt-3">Load More</button>
+<button id="loadMore" class="btn btn-primary mt-3 float-end">Load More</button>
+
+
 
 <script>
     document.addEventListener('turbo:frame-load', function (event) {
@@ -7,7 +9,7 @@
             var chartData = <%= @chart_data.to_json.html_safe %>;
 
             var currentBatch = 0;
-            var BATCH_SIZE = 10000; // This should match the BATCH_SIZE in your controller
+            var BATCH_SIZE = 50000; // This should match the BATCH_SIZE in your controller
 
             var difficultyData = chartData.map(function(item) { return [item[0], item[1]]; });
             var numtxsData = chartData.map(function(item) { return [item[0], item[2]]; });
@@ -39,7 +41,7 @@
                     opposite: true
                 }, {
                     title: {
-                        text: 'Block Size'
+                        text: 'Block Size MB'
                     },
                     opposite: true
                 }],
@@ -83,8 +85,20 @@
                 // Rest of the chart configuration
             });
 
+            hideLoadingIndicator();
+
+            function showLoadingIndicator() {
+                document.getElementById('loadingIndicator').style.display = 'block';
+            }
+
+            function hideLoadingIndicator() {
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }
+
+
             function loadBatch() {
                 currentBatch++;
+                showLoadingIndicator();
                 $.ajax({
                     url: '<%= block_histories_path %>',
                     data: {
@@ -99,7 +113,11 @@
                             chart.series[1].addPoint([item[0], item[2]], false);
                             chart.series[2].addPoint([item[0], item[3]], false);
                         });
+                        hideLoadingIndicator();
                         chart.redraw();
+                    },
+                    error: function() {
+                        hideLoadingIndicator();
                     }
                 });
             }

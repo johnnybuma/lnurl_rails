@@ -7,7 +7,7 @@
           Enter Block Range
         </div>
         <div class="card-body">
-          <%= form_with url: block_histories_path, method: :get, class: 'row g-3', data: { turbo_frame: "block_chart" } do %>
+          <%= form_with url: block_histories_path, method: :get, class: 'row g-3', id: "blockHistoryForm", data: { turbo_frame: "block_chart" } do %>
             <div class="col-md-6">
               <%= label_tag :start_block, 'Start Block', class: 'form-label' %>
               <%= number_field_tag :start_block, params[:start_block], min: 0, class: 'form-control' %>
@@ -24,8 +24,83 @@
       </div>
     </div>
   </div>
+  <div class="row">
+
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="text-center" style="display: none;">
+      <div class="ellipsis">
+        <div></div><div></div><div></div><div></div>
+      </div>
+    </div>
+
+    <style>
+        #loadingIndicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .ellipsis {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 13px;
+            div {
+                position: absolute;
+                top: 6px;
+                width: 13px;
+                height: 13px;
+                border-radius: 50%;
+                background: #007bff;
+                animation-timing-function: cubic-bezier(0, 1, 1, 0);
+            }
+            div:nth-child(1) { left: 8px; animation: ellipsis1 0.6s infinite; }
+            div:nth-child(2) { left: 8px; animation: ellipsis2 0.6s infinite; }
+            div:nth-child(3) { left: 32px; animation: ellipsis2 0.6s infinite; }
+            div:nth-child(4) { left: 56px; animation: ellipsis3 0.6s infinite; }
+        }
+
+        @keyframes ellipsis1 {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes ellipsis2 {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(24px, 0); }
+        }
+
+        @keyframes ellipsis3 {
+            0% { transform: scale(1); }
+            100% { transform: scale(0); }
+        }
+    </style>
+
+    <!-- end of loading indicator -->
+
+
+    <%= turbo_frame_tag "block_chart" do %>
+      <%= render 'chart' %>
+    <% end %>
+  </div>
 </div>
 
-<%= turbo_frame_tag "block_chart" do %>
-  <%= render 'chart' %>
-<% end %>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('blockHistoryForm').addEventListener('submit', function() {
+            showLoadingIndicator();
+        });
+    });
+
+    function showLoadingIndicator() {
+        document.getElementById('loadingIndicator').style.display = 'block';
+    }
+
+    function hideLoadingIndicator() {
+        document.getElementById('loadingIndicator').style.display = 'none';
+    }
+</script>
