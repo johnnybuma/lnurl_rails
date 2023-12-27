@@ -8,13 +8,15 @@
             if (chartData && chartData.length > 0) {
                 var difficultyData = chartData.map(function(item) { return [item[0], item[1]]; });
                 var numtxsData = chartData.map(function(item) { return [item[0], item[2]]; });
+                var sizeData = chartData.map(function(item) { return [item[0], item[3]]; });
+
 
                 Highcharts.chart('difficulty-numtxs-chart', {
                     chart: {
                         zoomType: 'x'
                     },
                     title: {
-                        text: 'Difficulty vs Number of Txs'
+                        text: 'Difficulty vs Number of Txs vs Size'
                     },
                     xAxis: {
                         type: 'block_number',
@@ -31,6 +33,10 @@
                             text: 'Number of Txs'
                         },
                         opposite: true
+                    }, {
+                        title: {
+                            text: 'Block Size'
+                        }
                     }],
                     plotOptions: {
                         series: {
@@ -59,6 +65,10 @@
                         data: numtxsData,
                         yAxis: 1,
                         zIndex: 0 // Lower zIndex for Number Txs
+                    }, {
+                        name: 'Blocksize',
+                        data: sizeData,
+                        zIndex: 2 // Ensure Difficulty is on top
                     }]
                 });
             } else {

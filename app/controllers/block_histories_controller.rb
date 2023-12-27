@@ -20,9 +20,10 @@ class BlockHistoriesController < ApplicationController
       # Extract difficulty and number of transactions
       difficulty = response['difficulty'] || 0
       numtxs = response['nTx'] || 0
+      blocksize = response["size"]
 
       # Push the required data into the chart_data array
-      chart_data << [block_history.block_number, difficulty.to_f, numtxs.to_f]
+      chart_data << [block_history.block_number, difficulty.to_f, numtxs.to_f, blocksize.to_f]
     end
 
     # Assign the prepared data to @chart_data for use in the view
