@@ -1,0 +1,88 @@
+<!-- app/views/your_controller/your_action.html.erb -->
+<div id="c3_chart"></div>
+
+<script>
+    document.addEventListener('turbo:frame-load', function (event) {
+        var chartData = <%= chart_data.to_json.html_safe %>;
+        console.log(chartData);
+
+        var blockNumbers = ['Block Numbers'];
+        var difficulties = ['Difficulty'];
+        var numTxs = ['Transactions'];
+        var blockSizes = ['Block Size'];
+
+        chartData.forEach(function(row) {
+            blockNumbers.push(row[0]);
+            difficulties.push(row[1]);
+            numTxs.push(row[2]);
+            blockSizes.push(row[3]);
+        });
+
+        var chart = c3.generate({
+            bindto: '#c3_chart',
+            data: {
+                x: 'Block Numbers',
+                columns: [
+                    blockNumbers,
+                    difficulties,
+                    numTxs,
+                    blockSizes
+                ],
+                types: {
+                    Difficulty: 'line',
+                    Transactions: 'bar',
+                    BlockSize: 'area'
+                }
+            },
+            axis: {
+                x: {
+                    label: 'Block Number',
+                    type: 'category' // or 'timeseries' if block numbers are date-based
+                },
+                y: {
+                    label: 'Value'
+                }
+            }
+        });
+
+
+        hideLoadingIndicator();
+
+        function showLoadingIndicator() {
+            document.getElementById('loadingIndicator').style.display = 'block';
+        }
+
+        function hideLoadingIndicator() {
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+
+
+        function loadBatch() {
+            currentBatch++;
+            showLoadingIndicator();
+            $.ajax({
+                url: '<%= block_histories_path %>',
+                data: {
+                    start_block: <%= params[:start_block] %>,
+                    end_block: <%= params[:end_block] %>,
+                    batch_number: currentBatch
+                },
+                dataType: 'json',
+                success: function(batchData) {
+                    batchData.forEach(function(item) {
+                        chart.series[0].addPoint([item[0], item[1]], false);
+                        chart.series[1].addPoint([item[0], item[2]], false);
+                        chart.series[2].addPoint([item[0], item[3]], false);
+                    });
+                    hideLoadingIndicator();
+                    chart.redraw();
+                },
+                error: function() {
+                    hideLoadingIndicator();
+                }
+            });
+        }
+
+        document.getElementById('loadMore').addEventListener('click', loadBatch);
+    });
+</script>

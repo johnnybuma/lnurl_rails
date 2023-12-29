@@ -39,6 +39,7 @@ class BlockHistoriesController < ApplicationController
     @chart_data = chart_data
 
 
+
     respond_to do |format|
       format.html # for the initial page load
       format.json { render json: @chart_data } # for AJAX requests

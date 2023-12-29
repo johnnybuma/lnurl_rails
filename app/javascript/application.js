@@ -5,7 +5,15 @@ import './add_jquery'
 import Highcharts from './highcharts'
 window.Highcharts = Highcharts
 
+import * as d3 from "d3";
+window.d3 = d3
+
+import c3 from 'c3'
+window.c3 = c3
+
 import * as bootstrap from "bootstrap"
+
+
 
 let popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
 let popoverList = popoverTriggerList.map(function (popoverTriggerEl) {

@@ -30,8 +30,6 @@
     </div>
   </div>
   <div class="row">
-
-
     <!-- Loading Indicator -->
     <div id="loadingIndicator" class="text-center" style="display: none;">
       <div class="ellipsis">
@@ -82,16 +80,16 @@
             100% { transform: scale(0); }
         }
     </style>
-
     <!-- end of loading indicator -->
-
-
     <%= turbo_frame_tag "block_chart" do %>
       <%= render 'chart' %>
     <% end %>
-  </div>
-</div>
 
+
+
+  </div>
+
+</div>
 
 
 <script>
