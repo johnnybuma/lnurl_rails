@@ -8,17 +8,21 @@ class BlockHistoriesController < ApplicationController
     batch_number = params[:batch_number].to_i || 0
 
     offset = batch_number * BATCH_SIZE
-    @block_histories = BlockHistory
-                         .where(block_number: start_block..end_block)
-                         .order(:block_number)
-                         .offset(offset)
-                         .limit(BATCH_SIZE)
 
     # Initialize an empty array for chart data
     chart_data = []
 
-    # Populate chart_data with only the necessary values
-    @block_histories.each do |block_history|
+    # Select only needed columns and use find_each for batch processing
+    BlockHistory
+      .select(:id, :block_number, :data)
+      .where(block_number: start_block..end_block)
+      .order(:block_number)
+      .offset(offset)
+      .limit(BATCH_SIZE)
+      .find_each(batch_size: BATCH_SIZE) do |block_history| # Adjust batch_size as needed
+
+
+
       data = JSON.parse(block_history.data)
       response = data['result'] || {}
 
@@ -33,6 +37,7 @@ class BlockHistoriesController < ApplicationController
 
     # Assign the prepared data to @chart_data for use in the view
     @chart_data = chart_data
+
 
     respond_to do |format|
       format.html # for the initial page load
