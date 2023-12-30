@@ -50,7 +50,7 @@
             var numtxsData = chartData.map(function(item) { return [item[0], item[2]]; });
             var blockSizeData = chartData.map(function(item) { return [item[0], item[3]]; });
 
-            var chart = Highcharts.chart('difficulty-numtxs-chart', {
+            let chart = Highcharts.chart('difficulty-numtxs-chart', {
                 chart: {
                     zoomType: 'x',
                     type: 'column' // Default to column, but this will be overridden per series
@@ -147,6 +147,7 @@
             function updateChart(batchData) {
                 batchData.forEach(function(item) {
                     chart.series[0].addPoint([item[0], item[1]], false);
+                    console.log(chart.series[0].addPoint([item[0], item[1]], false));
                     chart.series[1].addPoint([item[0], item[2]], false);
                     chart.series[2].addPoint([item[0], item[3]], false);
                 });
@@ -164,10 +165,10 @@
                         batch_number: currentBatch
                     },
                     dataType: 'json',
-                    success: function(batchData) {
-                        console.log(batchData);
-                        updateTable(batchData);
-                        updateChart(batchData);
+                    success: function(currentBatch) {
+                        console.log(currentBatch);
+                        updateTable(currentBatch);
+                        updateChart(currentBatch);
 
                         hideLoadingIndicator();
 
