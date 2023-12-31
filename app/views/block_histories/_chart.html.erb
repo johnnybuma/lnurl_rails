@@ -89,14 +89,6 @@
 
 </script>
 
-
-
-<script>
-    $(document).ready(function () {
-      let table = new DataTable('#blockHistoryTable');
-  });
-</script>
-
 <script>
     $(document).on('ready turbo:frame-load', function (event) {
 
@@ -196,16 +188,20 @@
 
             function updateTable(batchData) {
                 batchData.forEach(function(item) {
+                    var block = item[0].toString();
+                    var linkHTML = '<a class="view-transactions-link" id="view_txs_' + block + '" data-block-number="' + block + '" data-turbo-frame="transactions_frame_' + block + '" data-bs-toggle="modal" data-bs-target="#transactionsModal_' + block + '" href="/block_histories/' + block + '/transactions">View Transactions</a>';
+
                     let newRow = table.row.add([
-                        item[0].toString(), // Block Number
+                        block, // Block Number
                         item[1].toString(), // Difficulty
-                        item[2].toString(), // Number of Transactions
+                        item[2].toString() + linkHTML, // Number of Transactions + Link
                         item[3].toString()  // Block Size (MB)
                     ]).node();
                     $(newRow).addClass('newly-added-row'); // Optional: Add a class to new rows
                 });
                 table.draw(false); // Redraw the table without resetting the paging
             }
+
 
             function updateChart(batchData) {
                 batchData.forEach(function(item) {
