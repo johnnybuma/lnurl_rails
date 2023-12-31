@@ -17,8 +17,23 @@
       <% @chart_data.each do |data| %>
         <tr>
           <td><%= data[0] %></td>
-          <td><%= data[1] %></td>
-          <td><%= data[2] %></td>
+          <td>
+
+            <%= data[1] %>
+
+          </td>
+          <td>
+            <%= data[2] %>
+
+            <% block = BlockHistory.where(block_number: data[0]).first
+               data = JSON.parse(block.data)
+               response = data['result'] || {}
+               transactions = response['tx'] || []
+
+            %>
+            <%= transactions %>
+
+          </td>
           <td><%= data[3] %></td>
         </tr>
       <% end %>
