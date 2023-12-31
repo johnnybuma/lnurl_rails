@@ -1,72 +1,108 @@
-
 <div class="row justify-content-md-left">
   <!--Grid column-->
-  <div class="col-md-3 ">
+  <div class="col-md-6 mb-4">
     <div class="card">
       <div class="card-header">
-        <h2>Edit <%= resource_name.to_s.humanize %></h2>
+        <h2 class="h4">Edit <%= resource_name.to_s.humanize %></h2>
       </div>
       <div class="card-body">
-        <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+        <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "needs-validation", novalidate: "" }) do |f| %>
           <%= render "devise/shared/error_messages", resource: resource %>
 
-          <div class="field">
-            <%= f.label :email %><br />
-            <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+          <!-- Email Field -->
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="email-addon">Email</span>
+            <%= f.email_field :email, autofocus: true, autocomplete: "email", class: 'form-control', 'aria-describedby': "email-addon" %>
+          </div>
 
+          <!-- Username Field -->
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="username-addon">Username</span>
+            <%= f.text_field :username, autocomplete: "username", class: 'form-control', 'aria-describedby': "username-addon" %>
           </div>
-          <div class="field">
-            <%= f.label :username %><br />
-            <%= f.text_field :username, autocomplete: "username" %>
-          </div>
-          <div class="field">
-            <%= f.label :avatar %>
-            <%= f.file_field :avatar %>
+          <!-- Avatar Section -->
+          <div class="card mt-4">
+            <div class="card-body">
+              <h5 class="card-title">Avatar</h5>
+
+              <!-- Existing Avatar Display -->
+              <% if resource.avatar.attached? %>
+                <div class="mb-3">
+                  <img src="<%= url_for(resource.avatar) %>" alt="Current Avatar" style="max-width: 100px; height: auto;">
+                </div>
+              <% end %>
+
+              <!-- Avatar Field -->
+              <div class="input-group mb-3">
+                <!-- JavaScript for Confirmation -->
+                <script>
+                    document.getElementById('update-button').addEventListener('click', function(event) {
+                        var confirmAction = confirm('Are you sure you want to update your account details?');
+                        if (!confirmAction) {
+                            event.preventDefault(); // Prevent form submission if the user cancels
+                        }
+                    });
+                </script>                <%= f.file_field :avatar, id: "user_avatar", class: 'form-control', 'aria-describedby': "avatar-addon" %>
+              </div>
+            </div>
           </div>
 
           <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-            <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
+            <div class="alert alert-info">Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
           <% end %>
 
-          <div class="field">
-            <%= f.label :password %> <i>(leave blank if you don't want to change it)</i><br />
-            <%= f.password_field :password, autocomplete: "new-password" %>
-            <% if @minimum_password_length %>
-              <br />
-              <em><%= @minimum_password_length %> characters minimum</em>
-            <% end %>
+          <!-- Password Change Section -->
+          <div class="card border-info mt-4">
+            <div class="card-header bg-info text-white">
+              Change Password (Optional)
+            </div>
+            <div class="card-body">
+              <p class="text-muted">If you wish to change your password, fill in the following fields:</p>
+
+              <!-- Password Field -->
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="password-addon">New Password</span>
+                <% placeholder_text = @minimum_password_length ? "#{@minimum_password_length} characters minimum" : "Enter your password" %>
+                <%= f.password_field :password, autocomplete: "new-password", class: 'form-control', placeholder: placeholder_text, 'aria-describedby': "password-addon" %>
+
+              </div>
+
+              <!-- Password Confirmation Field -->
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="password-confirmation-addon">New Password Confirmation</span>
+                <%= f.password_field :password_confirmation, autocomplete: "new-password", class: 'form-control', 'aria-describedby': "password-confirmation-addon" %>
+              </div>
+            </div>
           </div>
 
-          <div class="field">
-            <%= f.label :password_confirmation %><br />
-            <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
+
+          <!-- Separate card for critical elements -->
+          <div class="card mt-4 bg-light">
+            <div class="card-body">
+              <!-- Current Password Field -->
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="current-password-addon">Current Password</span>
+                <%= f.password_field :current_password, autocomplete: "current-password", class: 'form-control', placeholder: 'Required to make any changes', 'aria-describedby': "current-password-addon" %>
+              </div>
+
+              <!-- Update Button with ID -->
+              <div class="d-grid mb-3">
+                <%= f.submit "Update", class: "btn btn-danger btn-lg", id: "update-button" %>
+              </div>
+            </div>
           </div>
 
-          <div class="field">
-            <%= f.label :current_password %> <i>(we need your current password to confirm your changes)</i><br />
-            <%= f.password_field :current_password, autocomplete: "current-password" %>
-          </div>
-
-          <div class="actions">
-            <%= f.submit "Update" %>
-          </div>
         <% end %>
-
       </div>
-      <div class="card-footer">
-        <h3>Cancel my account</h3>
-
-        <p>Unhappy? <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?" }, method: :delete %></p>
-
-        <%= link_to "Back", :back %>
-      </div>
-
-
-
     </div>
   </div>
 </div>
-
-
-
-
+<!-- JavaScript for Confirmation -->
+<script>
+    document.getElementById('update-button').addEventListener('click', function(event) {
+        var confirmAction = confirm('Are you sure you want to update your account details?');
+        if (!confirmAction) {
+            event.preventDefault(); // Prevent form submission if the user cancels
+        }
+    });
+</script>
