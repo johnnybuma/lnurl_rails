@@ -1,5 +1,7 @@
 # app/controllers/block_histories_controller.rb
 class BlockHistoriesController < ApplicationController
+
+
   BATCH_SIZE = 50000 # Adjust the batch size based on your performance tests
 
   def index
@@ -45,4 +47,16 @@ class BlockHistoriesController < ApplicationController
       format.json { render json: @chart_data } # for AJAX requests
     end
   end
+
+  def show_transactions
+    @block = BlockHistory.find_by(block_number: params[:block_number])
+    @transactions = @block ? JSON.parse(@block.data).dig('result', 'tx') || [] : []
+
+
+  end
+
+
+
+
+
 end

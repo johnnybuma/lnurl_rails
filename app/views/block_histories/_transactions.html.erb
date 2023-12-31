@@ -1,0 +1,8 @@
+<!-- app/views/block_histories/_transactions.html.erb -->
+<% if @transactions.any? %>
+  <% @transactions.each do |tx| %>
+    <p><%= tx %></p>
+  <% end %>
+<% else %>
+  <p>No transactions found.</p>
+<% end %>

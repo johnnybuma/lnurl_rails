@@ -18,6 +18,9 @@ Rails.application.routes.draw do
 
   resources :block_histories
 
+  get 'block_histories/:block_number/transactions', to: 'block_histories#show_transactions', as: 'block_transactions'
+
+
   root to: "chain_data#index"
 
 

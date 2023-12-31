@@ -17,36 +17,83 @@
       <% @chart_data.each do |data| %>
         <tr>
           <td><%= data[0] %></td>
-          <td>
-
-            <%= data[1] %>
-
-          </td>
+          <td><%= data[1] %></td>
           <td>
             <%= data[2] %>
-
-            <% block = BlockHistory.where(block_number: data[0]).first
-               data = JSON.parse(block.data)
-               response = data['result'] || {}
-               transactions = response['tx'] || []
-
-            %>
-            <%= transactions %>
-
+            <%= link_to "View Transactions",
+                        block_transactions_path(block_number: data[0]),
+                        class: "view-transactions-link",
+                        id: "view_txs_#{data[0]}",
+                        data: {
+                          block_number: data[0],
+                          turbo_frame: "transactions_frame_#{data[0]}",
+                          bs_toggle: "modal",
+                          bs_target: "#transactionsModal_#{data[0]}"
+                        } %>
           </td>
           <td><%= data[3] %></td>
         </tr>
+
+
+        <!-- Modal Structure for Each Block -->
+        <div class="modal fade" id="transactionsModal_<%= data[0] %>" tabindex="-1" aria-labelledby="transactionsModalLabel_<%= data[0] %>" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="transactionsModalLabel_<%= data[0] %>">Block Transactions - <%= data[0] %></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body" id="transactionsModalBody" >
+                <%= turbo_frame_tag "transactions_frame_#{data[0]}" %>
+              </div>
+            </div>
+          </div>
+        </div>
       <% end %>
+
+
       </tbody>
     </table>
   </div>
 </div>
 
 
-<script>
-  $(document).ready(function () {
-      let table = new DataTable('#blockHistoryTable');
 
+<script>
+    $(document).on('ready load turbo:frame-load',function() {
+        $('.view-transactions-link').on('click', function(event) {
+            event.preventDefault();
+            console.log("Shit was clicked!");
+            console.log($(this));
+
+            var blockNumber = $(this).data('blockNumber');
+            var modalId = `#transactionsModal_${blockNumber}`;
+            var frameId = `#transactions_frame_${blockNumber}`;
+
+            $.ajax({
+                url: `/block_histories/${blockNumber}/transactions`,
+                method: 'GET',
+                success: function(response) {
+                    var content = $(response).find('#transaction-content').html();
+                    $(frameId).html(content);
+                    $(modalId).modal('show');
+                    console.log(response);
+                    console.log("HOLY FUCKING SHITBALLS");
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching transactions:', error);
+                }
+            });
+        });
+    });
+
+</script>
+
+
+
+<script>
+    $(document).ready(function () {
+      let table = new DataTable('#blockHistoryTable');
   });
 </script>
 
@@ -61,6 +108,7 @@
 
             var currentBatch = 0;
 
+            var blockNumber = chartData.map(function (item) {return item[0]});
             var difficultyData = chartData.map(function(item) { return [item[0], item[1]]; });
             var numtxsData = chartData.map(function(item) { return [item[0], item[2]]; });
             var blockSizeData = chartData.map(function(item) { return [item[0], item[3]]; });
@@ -168,6 +216,10 @@
                 });
                 chart.redraw();
             }
+
+
+
+
 
             function loadBatch() {
                 currentBatch++;
