@@ -206,6 +206,11 @@ tr.items_row > td {
   background-color: #f8f9fa;
 }
 
+.small-accordion-header .accordion-button {
+  padding: 0.5rem 1rem; /* Adjust the padding to reduce the height */
+  font-size: 0.9rem; /* Optional: Adjust the font size if needed */
+}
+
 @import "c3/c3";
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';

@@ -2,6 +2,8 @@
 import "@hotwired/turbo-rails"
 import "./controllers"
 import './add_jquery'
+import './tx_details'
+
 import Highcharts from './highcharts'
 window.Highcharts = Highcharts
 

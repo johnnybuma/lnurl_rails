@@ -1,5 +1,8 @@
 <!-- app/views/block_histories/show_transactions.html.erb -->
 <div id="transaction-content">
+  <div id="testTxDetails">
+
+  </div>
   <% if @transactions.any? %>
     <table class="table table-striped" id="transaction_list_table">
       <thead>
@@ -13,8 +16,9 @@
         <tr>
           <td class="tx"><%= tx %></td>
           <td>
-            <%= link_to 'View Details', block_history_transaction_path(tx), target: '_blank', class: 'transaction-link', data: { tx_id: tx } %>
-            <div id="transaction-details-<%= tx %>" class="transaction-details" style="display: none;"></div>
+            <%= link_to 'View Details', '#', class: 'view-transaction-link', data: { tx_id: tx } %>
+
+
           </td>
         </tr>
       <% end %>
