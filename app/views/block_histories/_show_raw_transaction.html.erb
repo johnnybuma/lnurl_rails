@@ -1,0 +1,30 @@
+<!-- app/views/block_histories/_transaction_details.html.erb -->
+<div class="container-fluid">
+  <div class="row">
+    <% transaction.each do |key, value| %>
+      <div class="col-md-3 mb-3">
+        <div class="card h-100">
+          <div class="card-header">
+            <%= key.humanize %>
+          </div>
+          <div class="card-body overflow-auto" style="max-height: 200px;">
+            <% if key == 'vin' %>
+              <% value.each_with_index do |item, index| %>
+                <strong>Input <%= index + 1 %>:</strong>
+                <%= render 'transaction_item', item: item %>
+              <% end %>
+            <% elsif key == 'vout' %>
+              <% value.each_with_index do |item, index| %>
+                <strong>Output <%= index + 1 %>:</strong>
+                <%= render 'transaction_item', item: item %>
+              <% end %>
+            <% else %>
+              <%= value.is_a?(Hash) ? value.to_json : value %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+</div>

@@ -1,0 +1,13 @@
+<!-- app/views/block_histories/_transaction_item.html.erb -->
+<div>
+  <% item.each do |k, v| %>
+    <% if k == 'scriptSig' || k == 'scriptPubKey' %>
+      <div><strong><%= k.humanize %>:</strong></div>
+      <% v.each do |script_key, script_value| %>
+        <div class="ms-3"><strong><%= script_key.humanize %>:</strong> <%= script_value %></div>
+      <% end %>
+    <% else %>
+      <div><strong><%= k.humanize %>:</strong> <%= v %></div>
+    <% end %>
+  <% end %>
+</div>

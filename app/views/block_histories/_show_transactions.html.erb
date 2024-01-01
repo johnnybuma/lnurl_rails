@@ -1,7 +1,30 @@
 <!-- app/views/block_histories/show_transactions.html.erb -->
 <div id="transaction-content">
-  <% transactions.each do |tx| %>
-    <p><%= tx %></p>
+  <% if @transactions.any? %>
+    <table class="table table-striped" id="transaction_list_table">
+      <thead>
+      <tr>
+        <th scope="col" class="sort" data-sort="tx">Transaction ID</th>
+        <th scope="col">Actions</th>
+      </tr>
+      </thead>
+      <tbody class="list">
+      <% @transactions.each do |tx| %>
+        <tr>
+          <td class="tx"><%= tx %></td>
+          <td>
+            <%= link_to 'View Details', block_history_transaction_path(tx), target: '_blank', class: 'transaction-link', data: { tx_id: tx } %>
+            <div id="transaction-details-<%= tx %>" class="transaction-details" style="display: none;"></div>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p>No transactions found.</p>
   <% end %>
 </div>
 
+<script>
+
+</script>

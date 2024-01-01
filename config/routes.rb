@@ -20,6 +20,8 @@ Rails.application.routes.draw do
 
   get 'block_histories/:block_number/transactions', to: 'block_histories#show_transactions', as: 'block_transactions'
 
+  get 'block_histories/transactions/:tx_id', to: 'block_histories#show_raw_transaction', as: 'block_history_transaction'
+
 
   root to: "chain_data#index"
 

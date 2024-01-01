@@ -52,9 +52,33 @@ class BlockHistoriesController < ApplicationController
     @block = BlockHistory.find_by(block_number: params[:block_number])
     @transactions = @block ? JSON.parse(@block.data).dig('result', 'tx') || [] : []
 
-
   end
 
+
+  def show_raw_transaction
+
+    tx_id = params[:tx_id]
+
+
+    rpc_url = ENV['BITCOIN_RPC_URL']
+    rpc_user = ENV['BITCOIN_RPC_USERNAME']
+    rpc_password = ENV['BITCOIN_RPC_PASSWORD']
+
+    bitcoin = BitcoinCoreRpc::API.new(rpc_url, rpc_user, rpc_password)
+
+    raw_tx = bitcoin.get_raw_transaction(tx_id)
+
+    # Check if raw_tx is already a Hash and contains the needed data
+    if raw_tx.is_a?(Hash) && raw_tx.key?('result')
+      @transaction = raw_tx['result']
+    else
+      # Handle the case where raw_tx is not in the expected format
+      @transaction = {} # or handle this case as needed
+    end
+
+
+
+  end
 
 
 

@@ -49,6 +49,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" id="transactionsModalBody">
+
         <!-- Transactions will be loaded here dynamically -->
       </div>
     </div>
@@ -56,7 +57,10 @@
 </div>
 
 <script>
+
+
     $(document).on('ready load turbo:frame-load',function() {
+
         $(document).on('click', '.view-transactions-link', function(event) {
             event.preventDefault();
             var blockNumber = $(this).data('blockNumber');
@@ -68,8 +72,10 @@
                     var content = $(response).find('#transaction-content').html();
                     $('#transactionsModalLabel').html(`Block Number ${blockNumber} Transactions`);
                     $('#transactionsModalBody').html(content);
-                    var transactionsModal = new bootstrap.Modal($('#transactionsModal'));
-                    transactionsModal.show();
+
+                    new DataTable('#transactionsModal table');
+
+                    $('#transactionsModal').show();
 
                 },
                 error: function(xhr, status, error) {
@@ -77,6 +83,7 @@
                 }
             });
         });
+
     });
 
 </script>
@@ -85,6 +92,7 @@
     $(document).on('ready turbo:frame-load', function (event) {
 
         let table = new DataTable('#blockHistoryTable');
+
 
 
         if (event.target.id === 'block_chart') {

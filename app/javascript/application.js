@@ -13,6 +13,8 @@ window.c3 = c3
 
 import * as bootstrap from "bootstrap"
 
+window.bootstrap = bootstrap
+
 
 
 let popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))

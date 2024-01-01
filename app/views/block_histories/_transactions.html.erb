@@ -1,7 +1,12 @@
 <!-- app/views/block_histories/_transactions.html.erb -->
 <% if @transactions.any? %>
   <% @transactions.each do |tx| %>
-    <p><%= tx %></p>
+    <div class="transaction-item">
+      <p>
+        <%= link_to tx, block_history_transaction_path(tx), target: '_blank', class: 'transaction-link', data: { tx_id: tx } %>
+      </p>
+      <div id="transaction-details-<%= tx %>" class="transaction-details" style="display: none;"></div>
+    </div>
   <% end %>
 <% else %>
   <p>No transactions found.</p>
