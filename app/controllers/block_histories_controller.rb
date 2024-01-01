@@ -2,7 +2,7 @@
 class BlockHistoriesController < ApplicationController
 
 
-  BATCH_SIZE = 50000 # Adjust the batch size based on your performance tests
+  BATCH_SIZE = 20000 # Adjust the batch size based on your performance tests
 
   def index
     start_block = params[:start_block].to_i
