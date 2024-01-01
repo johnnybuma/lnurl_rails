@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/johnnybuma/bitcoin_core_rpc.git
-  revision: 018d374b3b9600b72cfa07a4ff8a632673af6b03
+  revision: bb4bd4fabbba87ab15bdd42c36e02c4cff6e4cb8
   branch: main
   specs:
-    bitcoin_core_rpc (0.1.0)
+    bitcoin_core_rpc (1.0.0)
       httparty
       json
 
