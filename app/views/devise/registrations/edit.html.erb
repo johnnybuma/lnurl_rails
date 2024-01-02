@@ -34,15 +34,7 @@
 
               <!-- Avatar Field -->
               <div class="input-group mb-3">
-                <!-- JavaScript for Confirmation -->
-                <script>
-                    document.getElementById('update-button').addEventListener('click', function(event) {
-                        var confirmAction = confirm('Are you sure you want to update your account details?');
-                        if (!confirmAction) {
-                            event.preventDefault(); // Prevent form submission if the user cancels
-                        }
-                    });
-                </script>                <%= f.file_field :avatar, id: "user_avatar", class: 'form-control', 'aria-describedby': "avatar-addon" %>
+                <%= f.file_field :avatar, id: "user_avatar", class: 'form-control', 'aria-describedby': "avatar-addon" %>
               </div>
             </div>
           </div>
