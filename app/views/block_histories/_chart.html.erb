@@ -11,6 +11,7 @@
         <th scope="col">Difficulty</th>
         <th scope="col">Number of Transactions</th>
         <th scope="col">Block Size (MB)</th>
+        <th scope="col">Transactions</th>
       </tr>
       </thead>
       <tbody>
@@ -20,13 +21,16 @@
           <td><%= data[1] %></td>
           <td>
             <%= data[2] %>
+
+          </td>
+          <td><%= data[3] %></td>
+          <td>
             <%= link_to "View Transactions", "#",
                         class: "view-transactions-link",
                         data: { bs_toggle: "modal",
                                 bs_target: "#transactionsModal",
                                 block_number: data[0] } %>
           </td>
-          <td><%= data[3] %></td>
         </tr>
 
 
@@ -42,7 +46,7 @@
 
 <!-- Single Modal Structure -->
 <div class="modal fade" id="transactionsModal" tabindex="-1" aria-labelledby="transactionsModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
+  <div class="modal-dialog custom-modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="transactionsModalLabel">Block Transactions</h5>
@@ -51,23 +55,6 @@
       <div class="modal-body" id="transactionsModalBody">
 
         <!-- Transactions will be loaded here dynamically -->
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Tx Details Modal -->
-
-<!-- Transaction Details Modal -->
-<div class="modal fade" id="transactionDetailsModal" tabindex="-1" aria-labelledby="transactionDetailsModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="transactionDetailsModalLabel">Transaction Details</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="txDetailsModalBody">
-        <!-- Transaction details will be loaded here -->
       </div>
     </div>
   </div>

@@ -1,32 +1,44 @@
 <!-- app/views/block_histories/show_transactions.html.erb -->
-<div id="transaction-content">
-  <div id="testTxDetails">
+<div class="container-fluid" id="transaction-content">
 
-  </div>
-  <% if @transactions.any? %>
-    <table class="table table-striped" id="transaction_list_table">
-      <thead>
-      <tr>
-        <th scope="col" class="sort" data-sort="tx">Transaction ID</th>
-        <th scope="col">Actions</th>
-      </tr>
-      </thead>
-      <tbody class="list">
-      <% @transactions.each do |tx| %>
-        <tr>
-          <td class="tx"><%= tx %></td>
-          <td>
-            <%= link_to 'View Details', '#', class: 'view-transaction-link', data: { tx_id: tx } %>
+  <div class="row">
+    <div class="col-6">
+      <% if @transactions.any? %>
+        <table class="table table-striped" id="transaction_list_table">
+          <thead>
+          <tr>
+            <th scope="col" class="sort" data-sort="tx">Transaction ID</th>
+            <th scope="col">Actions</th>
+          </tr>
+          </thead>
+          <tbody class="list">
+          <% @transactions.each do |tx| %>
+            <tr>
+              <td class="tx"><%= tx %></td>
+              <td>
+                <%= link_to 'View Details', '#', class: 'view-transaction-link', data: { tx_id: tx } %>
 
 
-          </td>
-        </tr>
+              </td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <p>No transactions found.</p>
       <% end %>
-      </tbody>
-    </table>
-  <% else %>
-    <p>No transactions found.</p>
-  <% end %>
+
+    </div>
+    <div class="col-6">
+      <div id="txHeightLimit">
+        <div id="testTxDetails">
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <script>

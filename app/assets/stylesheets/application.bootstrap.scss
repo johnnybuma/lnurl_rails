@@ -211,6 +211,16 @@ tr.items_row > td {
   font-size: 0.9rem; /* Optional: Adjust the font size if needed */
 }
 
+.custom-modal-dialog {
+  min-width: 90% !important;
+}
+
+#txHeightLimit {
+  height: 500px !important;
+  max-height: 500px !important;
+  overflow-x: scroll;
+}
+
 @import "c3/c3";
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';

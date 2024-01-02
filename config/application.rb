@@ -28,10 +28,16 @@ module LnUrlRails
     config.after_initialize do
       #Uncomment before sending to Heroku!!!
       if Rails.env.production?
+        system ("rvm use 3.2.2@nodeview")
+        sleep 5
+        system ("source ~/.bash_profile")
+        sleep 5
         system ("RAILS_ENV=production ruby daemon_start.rb start")
-        puts "<------------------It should be running----------------------->"
+        sleep 5
+        puts "Bitcoin Live Data Refresh Should be Working"
       else
         puts "The Environment loaded is in Development..."
+
       end
 
 
