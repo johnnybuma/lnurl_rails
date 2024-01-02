@@ -1,7 +1,6 @@
 Rails.application.routes.draw do
   resources :chain_data
 
-  devise_for :users
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Defines the root path route ("/")
@@ -9,9 +8,11 @@ Rails.application.routes.draw do
   #
 
 
-  devise_scope :user do
-    # Redirests signing out users back to sign-in
-    get "users", to: "devise/sessions#new"
+  devise_for :users, skip: [:registrations]
+  as :user do
+    get "/sign_in" => "devise/sessions#new" # custom path to login/sign_in
+    get 'users/edit' => 'devise/registrations#edit', :as => 'edit_user_registration'
+    put 'users' => 'devise/registrations#update', :as => 'user_registration'
   end
   #devise_for :users
   resources :users
