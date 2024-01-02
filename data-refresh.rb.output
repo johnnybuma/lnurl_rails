@@ -1,6 +1,0 @@
-data-refresh.rb: process with pid 92729 started.
-The Environment loaded is in Development...
-ruby: No such file or directory -- daemon_start.rb (LoadError)
-Bitcoin Live Data Refresh Should be Working
-objc[92729]: +[__NSCFConstantString initialize] may have been in progress in another thread when fork() was called.
-objc[92729]: +[__NSCFConstantString initialize] may have been in progress in another thread when fork() was called. We cannot safely call it or ignore it in the fork() child process. Crashing instead. Set a breakpoint on objc_initializeAfterForkError to debug.
