@@ -199,8 +199,10 @@
                     let newRow = table.row.add([
                         block, // Block Number
                         item[1].toString(), // Difficulty
-                        item[2].toString() + linkHTML, // Number of Transactions + Link
-                        item[3].toString()  // Block Size (MB)
+                        item[2].toString(), // Number of Transactions + Link
+                        item[3].toString(),
+                        linkHTML
+                        // Block Size (MB)
                     ]).node();
                     $(newRow).addClass('newly-added-row'); // Optional: Add a class to new rows
                 });
