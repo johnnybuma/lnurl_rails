@@ -194,23 +194,6 @@ tr.items_row > td {
   }
 }
 
-.accordion-header {
-  background-color: #007bff;
-  color: white;
-}
-.accordion-button:not(.collapsed) {
-  color: white;
-  background-color: #0056b3;
-}
-.accordion-body {
-  background-color: #f8f9fa;
-}
-
-.small-accordion-header .accordion-button {
-  padding: 0.5rem 1rem; /* Adjust the padding to reduce the height */
-  font-size: 0.9rem; /* Optional: Adjust the font size if needed */
-}
-
 .custom-modal-dialog {
   min-width: 90% !important;
 }
