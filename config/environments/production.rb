@@ -45,10 +45,10 @@ Rails.application.configure do
   # config.action_cable.url = "wss://example.com/cable"
   # config.action_cable.allowed_request_origins = [ "http://example.com", /http:\/\/example.*/ ]
   #
-  config.action_cable.allowed_request_origins = ["http://192.168.1.51",
+  config.action_cable.allowed_request_origins = ["http://192.168.15.25",
                                                  'http://127.0.0.1',
                                                  'https://www.nodeview.app',
-                                                 'https://47.181.116.135',
+                                                 'https://72.219.66.45',
                                                  'https://nodeview.app']
 
 
