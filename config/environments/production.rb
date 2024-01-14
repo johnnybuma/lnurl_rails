@@ -53,6 +53,7 @@ Rails.application.configure do
 
 
 
+  #Add a comment so the changes will make it to a commit
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true
 
