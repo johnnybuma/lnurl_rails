@@ -48,7 +48,7 @@ Rails.application.configure do
   config.action_cable.allowed_request_origins = ["http://192.168.15.25",
                                                  'http://127.0.0.1',
                                                  'https://www.nodeview.app',
-                                                 'https://72.219.66.45',
+                                                 'https://70.164.222.200',
                                                  'https://nodeview.app']
 
 
