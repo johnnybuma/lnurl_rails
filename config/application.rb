@@ -26,7 +26,6 @@ module LnUrlRails
 
 
     config.after_initialize do
-      #Uncomment before sending to Heroku!!!
       if Rails.env.production?
         system ("RAILS_ENV=production ruby daemon_start.rb start")
         sleep 5

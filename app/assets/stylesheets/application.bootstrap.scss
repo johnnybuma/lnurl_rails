@@ -11,16 +11,20 @@ $h1-font-size: 1.5rem; // this line was added
 
 }
 
+#verificationprogress_bar.progress-bar {
+  background-color: darkorange;
+}
+
 .flash-bg {
-  animation: flashBackground 5s ease-out;
+  animation: flashBackground 3s ease-out;
 }
 
 @keyframes flashBackground {
   0% {
-    background-color: #cce5ff;
+    background-color: darkorange;
   }
-  100% {
-    background-color: transparent;
+   100% {
+    background-color: darkgray;
   }
 }
 
@@ -204,7 +208,7 @@ tr.items_row > td {
   overflow-x: scroll;
 }
 
-@import "c3/c3";
+
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';
 

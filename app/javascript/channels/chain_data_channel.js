@@ -35,25 +35,18 @@ consumer.subscriptions.create("ChainDataChannel", {
         var progressPercent = (data.verificationprogress * 100).toFixed(2);
         progressBar.html('<span>' + progressPercent + '%</span>'); // Set HTML content
 
+        // Flash background effect for verification progress (optional)
+        progressBar.addClass('flash-bg');
+        setTimeout(function () {
+            progressBar.removeClass('flash-bg');
+        }, 5000);
         // Update the progress bar's width and aria-valuenow attribute
         if (progressBar.length) {
             progressBar.css('width', progressPercent + '%');
             progressBar.attr('aria-valuenow', progressPercent);
         }
 
-        // Assuming 'verificationprogress' is the id of an HTML element for the text
-        var verification_progress = $('#verificationprogress');
-        if (verification_progress.length) {
-            verification_progress.text(progressPercent + '%');
-
-            // Flash background effect for verification progress (optional)
-            verification_progress.parent().addClass('flash-bg');
-            setTimeout(function () {
-                verification_progress.parent().removeClass('flash-bg');
-            }, 5000);
-        }
-
-        // Update initialBlockDownload text
+              // Update initialBlockDownload text
         var initialBlockDownload = $('#initialblockdownload');
         initialBlockDownload.text(data.initialblockdownload);
 
