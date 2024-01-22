@@ -19,4 +19,6 @@ let popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
 });
 import "./channels"
 
-
+// Import D3.js
+import * as d3 from 'd3';
+window.d3 = d3;

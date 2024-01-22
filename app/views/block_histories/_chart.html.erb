@@ -1,4 +1,4 @@
-<div id="difficulty-numtxs-chart" style="width:100%; height:400px;"></div>
+<div id="d3-chart-container" style="width:100%; height:400px;"></div>
 
 
 <div class="container mt-4">
@@ -62,6 +62,41 @@
 
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var chartData = [4, 8, 15, 16, 23, 42]; // Sample static data
+
+        var width = 420, // Width of the chart
+          barHeight = 20; // Height of each bar
+
+        var x = d3.scaleLinear()
+          .domain([0, d3.max(chartData)])
+          .range([0, width]);
+
+        var chart = d3.select("#d3-chart-container")
+          .append("svg")
+          .attr("width", width)
+          .attr("height", barHeight * chartData.length);
+
+        var bar = chart.selectAll("g")
+          .data(chartData)
+          .enter().append("g")
+          .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+
+        bar.append("rect")
+          .attr("width", x)
+          .attr("height", barHeight - 1);
+
+        bar.append("text")
+          .attr("x", function(d) { return x(d) - 3; })
+          .attr("y", barHeight / 2)
+          .attr("dy", ".35em")
+          .text(function(d) { return d; });
+    });
+
+</script>
+
+
+<script>
 
 
     $(document).on('ready load turbo:frame-load',function() {
@@ -100,85 +135,12 @@
 
 
 
-        if (event.target.id === 'block_chart') {
+        if (event.target.id === 'd3-chart-container') {
             var chartData = <%= @chart_data.to_json.html_safe %>;
 
+            console.log(chartData);
             var currentBatch = 0;
 
-            var blockNumber = chartData.map(function (item) {return item[0]});
-            var difficultyData = chartData.map(function(item) { return [item[0], item[1]]; });
-            var numtxsData = chartData.map(function(item) { return [item[0], item[2]]; });
-            var blockSizeData = chartData.map(function(item) { return [item[0], item[3]]; });
-
-            let chart = Highcharts.chart('difficulty-numtxs-chart', {
-                chart: {
-                    zoomType: 'x',
-                    type: 'column' // Default to column, but this will be overridden per series
-
-                },
-                title: {
-                    text: 'Difficulty vs Number of Txs vs Size'
-                },
-                xAxis: {
-                    type: 'linear', // Changed to linear
-                    title: {
-                        text: 'Block Number'
-                    }
-                },
-                yAxis: [{
-                    title: {
-                        text: 'Difficulty'
-                    }
-                }, {
-                    title: {
-                        text: 'Number of Txs'
-                    },
-                    opposite: true
-                }, {
-                    title: {
-                        text: 'Block Size MB'
-                    },
-                    opposite: true
-                }],
-                plotOptions: {
-                    series: {
-                        turboThreshold: 0, // No limit on the number of data points
-                        marker: {
-                            enabled: false
-                        }
-                    }
-                },
-                tooltip: {
-                    shared: true,
-                    formatter: function () {
-                        var tooltipText = '<b>Block Number: ' + this.x + '</b><br/>';
-                        this.points.forEach(function(point) {
-                            tooltipText += point.series.name + ': ' + point.y + '<br/>';
-                        });
-                        return tooltipText;
-                    }
-                },
-                series: [{
-                    type: 'line', // Line chart for Difficulty
-                    name: 'Difficulty',
-                    data: difficultyData,
-                    zIndex: 2
-                }, {
-                    type: 'line', // Column chart for Number of Txs
-                    name: 'Number Txs',
-                    yAxis: 1,
-                    data: numtxsData,
-                    zIndex: 1 // Lower zIndex for Number Txs
-
-                }, {
-                    type: 'line', // Column chart for Number of Txs
-                    name: 'Blocksize',
-                    yAxis: 2,
-                    data: blockSizeData,
-                    zIndex: 0 // Ensure Difficulty is on top
-                }]
-                // Rest of the chart configuration
-            });
 
             hideLoadingIndicator();
 
@@ -210,15 +172,7 @@
             }
 
 
-            function updateChart(batchData) {
-                batchData.forEach(function(item) {
-                    chart.series[0].addPoint([item[0], item[1]], false);
-                    console.log(chart.series[0].addPoint([item[0], item[1]], false));
-                    chart.series[1].addPoint([item[0], item[2]], false);
-                    chart.series[2].addPoint([item[0], item[3]], false);
-                });
-                chart.redraw();
-            }
+
 
 
 
@@ -230,15 +184,14 @@
                 $.ajax({
                     url: '<%= block_histories_path %>',
                     data: {
-                        start_block: <%= params[:start_block] %>,
-                        end_block: <%= params[:end_block] %>,
+                        start_block: 0,
+                        end_block: 200000 ,
                         batch_number: currentBatch
                     },
                     dataType: 'json',
                     success: function(currentBatch) {
                         console.log(currentBatch);
                         updateTable(currentBatch);
-                        updateChart(currentBatch);
 
                         hideLoadingIndicator();
 
