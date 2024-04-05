@@ -41,6 +41,12 @@ gem 'redis-rails'
 gem 'aws-sdk-rails', '~> 3'
 gem 'aws-sdk-s3', '~> 1'
 
+
+# THIS WAS THE SECURITY EXPLOIT
+
+gem "rdoc", ">= 6.6.3.1"
+
+
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
 
