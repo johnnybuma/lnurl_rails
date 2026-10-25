@@ -1,0 +1,85 @@
+<div id="wallet_stored_balances_panel">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <div>
+      <span class="fw-semibold">Last balance — every address</span>
+      <span class="text-muted small d-block">
+        Postgres history · last scan per address (includes 0). Not wallet rescan.
+      </span>
+    </div>
+    <div class="text-end">
+      <div class="fw-semibold"><%= number_with_precision(stored_balance_total.to_f, precision: 8) %> BTC</div>
+      <div class="text-muted small">sum of last balances · <%= Array(stored_balances).size %> address(es)</div>
+    </div>
+  </div>
+
+  <% if import_runs.present? %>
+    <div class="table-responsive mb-3" style="max-height: 140px; overflow: auto;">
+      <table class="table table-sm mb-0">
+        <thead class="table-light sticky-top">
+          <tr>
+            <th>Run</th>
+            <th>label</th>
+            <th class="text-end">keys</th>
+            <th class="text-end">addrs</th>
+            <th class="text-end">run total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% import_runs.each do |run| %>
+            <tr>
+              <td class="small text-nowrap"><%= run.created_at.strftime("%m-%d %H:%M") %></td>
+              <td class="small font-monospace"><%= run.label_prefix %></td>
+              <td class="text-end small"><%= run.keys_ok %>/<%= run.keys_ok + run.keys_failed %></td>
+              <td class="text-end small"><%= run.addresses_stored %></td>
+              <td class="text-end small"><%= number_with_precision(run.total_balance.to_f, precision: 8) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+  <% if stored_balances.present? %>
+    <div class="table-responsive" style="max-height: 420px; overflow: auto;">
+      <table class="table table-sm table-hover align-middle mb-0">
+        <thead class="table-light sticky-top">
+          <tr>
+            <th>Address</th>
+            <th>Label</th>
+            <th class="text-end">Last balance</th>
+            <th class="text-end">Prev</th>
+            <th class="text-end">UTXOs</th>
+            <th>Last scanned</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% stored_balances.each do |row| %>
+            <% last_bal = row.respond_to?(:last_balance) ? row.last_balance.to_f : row.balance.to_f %>
+            <% prev_bal = row.respond_to?(:previous_balance) ? row.previous_balance.to_f : 0 %>
+            <tr class="<%= "table-success" if last_bal.positive? %>">
+              <td class="font-monospace small text-break"><%= row.address %></td>
+              <td class="small"><%= row.label.presence || "—" %></td>
+              <td class="text-end fw-semibold"><%= number_with_precision(last_bal, precision: 8) %></td>
+              <td class="text-end small text-muted"><%= number_with_precision(prev_bal, precision: 8) %></td>
+              <td class="text-end"><%= row.respond_to?(:last_utxo_count) ? row.last_utxo_count : row.utxo_count %></td>
+              <td class="small text-nowrap text-muted">
+                <%= (row.try(:last_scanned_at) || row.scanned_at)&.strftime("%Y-%m-%d %H:%M") || "—" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+        <tfoot class="table-light">
+          <tr>
+            <th colspan="2">All addresses (last balance sum)</th>
+            <th class="text-end"><%= number_with_precision(stored_balance_total.to_f, precision: 8) %></th>
+            <th colspan="3"></th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  <% else %>
+    <p class="text-muted small mb-0">
+      No stored balances yet. Batch-import private keys to list every address with its last UTXO balance.
+    </p>
+  <% end %>
+</div>

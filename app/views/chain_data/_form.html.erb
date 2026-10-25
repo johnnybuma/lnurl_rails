@@ -1,9 +1,8 @@
-<%= form_with(model: chain_datum) do |form| %>
+<%= form_with(model: chain_datum, data: { turbo_stream: true }) do |form| %>
   <% if chain_datum.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(chain_datum.errors.count, "error") %> prohibited this chain_datum from being saved:</h2>
-
-      <ul>
+    <div class="alert alert-danger">
+      <h2 class="h6"><%= pluralize(chain_datum.errors.count, "error") %> prohibited this record from being saved:</h2>
+      <ul class="mb-0">
         <% chain_datum.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -11,7 +10,23 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.submit %>
+  <div class="mb-3">
+    <%= form.label :key, class: "form-label" %>
+    <%= form.text_field :key, class: "form-control", required: true %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :value, class: "form-label" %>
+    <%= form.text_area :value, class: "form-control", rows: 4 %>
+  </div>
+
+  <div class="d-flex flex-wrap gap-2">
+    <%= form.submit class: "btn btn-primary" %>
+    <% if chain_datum.persisted? %>
+      <%= link_to "Show", chain_datum_path(chain_datum), class: "btn btn-outline-secondary" %>
+      <%= button_to "Destroy", chain_datum_path(chain_datum), method: :delete,
+                    class: "btn btn-outline-danger",
+                    form: { data: { turbo_stream: true, turbo_confirm: "Delete this chain datum?" } } %>
+    <% end %>
   </div>
 <% end %>

@@ -3,13 +3,13 @@ class UsersController < ApplicationController
   before_action :admin_only, :except => :show
 
   def index
-
     @user = User.new
+    @users = User.order(:username)
 
-    @users = User.where(nil)
-
-    @users = User.search(params[:search]) if params[:search].present?
-
+    if params[:search].present?
+      query = "%#{params[:search]}%"
+      @users = @users.where("username ILIKE :q OR email ILIKE :q", q: query)
+    end
   end
 
   def show
@@ -23,7 +23,7 @@ class UsersController < ApplicationController
 
   def update
     @user = User.find(params[:id])
-    if @user.update_attributes(secure_params)
+    if @user.update(secure_params)
       redirect_to users_path, :notice => "User updated."
     else
       redirect_to users_path, :alert => "Unable to update user."

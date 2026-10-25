@@ -1,35 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>NodeVeiw</title>
+    <title>NodeView</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= favicon_link_tag 'SYMBOLIC.png' %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
-
-    <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
-
-    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
-
-   <script src="//cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-
-    <style>
-      <%= ".cont-#{current_user&.id}" %> {
-          display: flex;
-          justify-content: flex-end;
-      }
-      <%= ".msg-blue-#{current_user&.id}" %> {
-          background-color: #007bff !important;
-          color: white;
-          padding: 100px;
-      }
-    </style>
+    <%# Single module build: Turbo + Stimulus + Bootstrap + channels (do not double-include) %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module", defer: true %>
   </head>
   <body>
     <div class="container-fluid">
@@ -56,7 +35,7 @@
             </div>
           </main>
           <footer class="row bg-light py-4 mt-auto">
-            <div class="col">Bitcoin RPC Explorer </div>
+            <div class="col">Bitcoin RPC Explorer</div>
           </footer>
         </div>
       </div>

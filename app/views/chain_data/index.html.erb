@@ -1,9 +1,14 @@
-<h1>Bitcoin RPC Explorer</h1>
-<hr>
-<%= turbo_frame_tag @chain_data do %>
-  <%= turbo_stream_from 'chain_data_channel' %>
-  <div id="chain_data">
-    <%= render 'chain_data', chain_data: @chain_data %>
+<div class="container-fluid mt-4">
+  <h1 class="h3 mb-3">Bitcoin RPC Explorer</h1>
+  <hr>
+
+  <%= turbo_stream_from "chain_data_channel" %>
+
+  <div id="chain_data" class="mb-4">
+    <%= render "chain_data", chain_data: @chain_data %>
   </div>
 
-<% end %>
+  <% if @block_count.present? %>
+    <p class="text-muted small">Block count: <strong><%= @block_count %></strong></p>
+  <% end %>
+</div>

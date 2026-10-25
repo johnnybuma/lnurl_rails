@@ -1,1 +1,12 @@
-<%= render 'show_transactions', transactions: @transactions %>
+<%# Full-page response (no turbo_frames). Turbo Stream clients get replace. %>
+<% content_for :title, "Block #{@block_number} transactions" %>
+
+<div class="container-fluid mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">Block <%= @block_number %> transactions</h1>
+    <%= link_to "← Chart View", block_histories_path, class: "btn btn-outline-secondary btn-sm" %>
+  </div>
+  <div id="block_transactions_panel">
+    <%= render "show_transactions" %>
+  </div>
+</div>

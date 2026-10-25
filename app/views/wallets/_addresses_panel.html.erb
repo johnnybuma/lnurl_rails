@@ -1,0 +1,44 @@
+<div id="wallet_addresses_panel">
+  <div class="table-responsive" style="max-height: 480px; overflow: auto;">
+    <table class="table table-sm table-hover align-middle mb-0">
+      <thead class="table-light sticky-top">
+        <tr>
+          <th>Address</th>
+          <th>Label</th>
+          <th class="text-end">Last balance</th>
+          <th class="text-end">Prev</th>
+          <th class="text-end">Conf</th>
+          <th>Last scanned</th>
+          <th>Source</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if addresses.present? %>
+          <% addresses.each do |row| %>
+            <% last_bal = row[:last_balance].nil? ? row[:amount] : row[:last_balance] %>
+            <% prev_bal = row[:previous_balance] %>
+            <tr class="<%= "table-success" if last_bal.to_f.positive? %>">
+              <td class="font-monospace small text-break"><%= row[:address] %></td>
+              <td class="small"><%= row[:label].presence || "—" %></td>
+              <td class="text-end fw-semibold">
+                <%= last_bal.nil? ? "—" : number_with_precision(last_bal.to_f, precision: 8) %>
+              </td>
+              <td class="text-end small text-muted">
+                <%= prev_bal.nil? ? "—" : number_with_precision(prev_bal.to_f, precision: 8) %>
+              </td>
+              <td class="text-end"><%= row[:confirmations].nil? ? "—" : row[:confirmations] %></td>
+              <td class="small text-nowrap text-muted">
+                <%= row[:last_scanned_at].respond_to?(:strftime) ? row[:last_scanned_at].strftime("%m-%d %H:%M") : (row[:last_scanned_at] || "—") %>
+              </td>
+              <td class="small text-muted"><%= row[:source] %></td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">No addresses yet.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

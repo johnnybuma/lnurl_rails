@@ -1,50 +1,78 @@
 <div class="col-12 col-sm-3 col-xl-2 px-sm-2 px-0 bg-dark d-flex sticky-top" id="navigation-sidebar">
   <div class="d-flex flex-sm-column flex-row flex-grow-1 align-items-center align-items-sm-start px-3 pt-2 text-white">
-    <a href="/" class="d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none">
+    <%= link_to root_path, class: "d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none" do %>
       <span class="fs-5"><span class="d-none d-sm-inline">NodeView</span></span>
-    </a>
+    <% end %>
+
     <ul class="nav nav-pills flex-sm-column flex-row flex-nowrap flex-shrink-1 flex-sm-grow-0 flex-grow-1 mb-sm-auto mb-0 justify-content-center align-items-center align-items-sm-start" id="menu">
       <% if user_signed_in? %>
-        <li>
-          <%= link_to root_path, class: 'nav-link px-sm-0 px-2' do %>
-            <i class="fs-5 bi-currency-bitcoin"></i><span class="ms-1 d-none d-sm-inline">Blockchain</span> </a>
-          <% end %>
-        </li>
-        <li>
-          <%= link_to block_histories_path, class: 'nav-link px-sm-0 px-2' do %>
-            <i class="fs-5 bi-graph-up"></i><span class="ms-1 d-none d-sm-inline">Chart View</span> </a>
+        <li class="nav-item">
+          <%= link_to root_path, class: "nav-link px-sm-0 px-2 text-white #{'active' if current_page?(root_path) || (controller_name == 'chain_data' && action_name == 'index')}" do %>
+            <i class="fs-5 bi-currency-bitcoin"></i>
+            <span class="ms-1 d-none d-sm-inline">Blockchain</span>
           <% end %>
         </li>
 
-
-    </ul>
-    <div class="dropdown py-sm-4 mt-sm-auto ms-auto ms-sm-0 flex-shrink-1">
-      <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-        <%= image_tag(current_user.avatar, width: 30, height: 30, class: 'rounded-circle') if current_user.avatar.attached? %>
-
-        <span class="d-none d-sm-inline mx-1"><%= current_user.username %></span>
-      </a>
-      <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-
-        <li>
-          <%= link_to edit_user_registration_path, class: 'dropdown-item' do %>
-            Profile
+        <li class="nav-item">
+          <%= link_to block_histories_path, class: "nav-link px-sm-0 px-2 text-white #{'active' if controller_name == 'block_histories'}" do %>
+            <i class="fs-5 bi-graph-up"></i>
+            <span class="ms-1 d-none d-sm-inline">Chart View</span>
           <% end %>
         </li>
-        <li>
-          <hr class="dropdown-divider">
-        </li>
-        <li>
-          <%= button_to(
-                "Log Out",
-                destroy_user_session_path,
-                method: :delete, class: 'dropdown-item'
-              ) %>
+
+        <% if current_user.admin? %>
+          <li class="nav-item">
+            <%= link_to wallets_path, class: "nav-link px-sm-0 px-2 text-white #{'active' if controller_name == 'wallets'}" do %>
+              <i class="fs-5 bi-wallet2"></i>
+              <span class="ms-1 d-none d-sm-inline">Wallets</span>
+            <% end %>
+          </li>
+
+          <li class="nav-item">
+            <%= link_to utxo_scan_path, class: "nav-link px-sm-0 px-2 text-white #{'active' if controller_name == 'utxo_scans'}" do %>
+              <i class="fs-5 bi-search"></i>
+              <span class="ms-1 d-none d-sm-inline">UTXO Scan</span>
+            <% end %>
+          </li>
+
+          <li class="nav-item">
+            <%= link_to users_path, class: "nav-link px-sm-0 px-2 text-white #{'active' if controller_name == 'users'}" do %>
+              <i class="fs-5 bi-people"></i>
+              <span class="ms-1 d-none d-sm-inline">Users</span>
+            <% end %>
+          </li>
+        <% end %>
+
+        <li class="nav-item">
+          <%= link_to edit_user_registration_path, class: "nav-link px-sm-0 px-2 text-white #{'active' if controller_name == 'registrations'}" do %>
+            <i class="fs-5 bi-person-gear"></i>
+            <span class="ms-1 d-none d-sm-inline">Profile</span>
+          <% end %>
         </li>
       <% end %>
-      </ul>
-    </div>
+    </ul>
 
+    <% if user_signed_in? %>
+      <div class="dropdown py-sm-4 mt-sm-auto ms-auto ms-sm-0 flex-shrink-1">
+        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+          <%= image_tag(current_user.avatar, width: 30, height: 30, class: "rounded-circle") if current_user.avatar.attached? %>
+          <span class="d-none d-sm-inline mx-1"><%= current_user.username %></span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+          <li>
+            <%= link_to "Profile", edit_user_registration_path, class: "dropdown-item" %>
+          </li>
+          <% if current_user.admin? %>
+            <li>
+              <%= link_to "Users", users_path, class: "dropdown-item" %>
+            </li>
+          <% end %>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <%= button_to "Log Out", destroy_user_session_path, method: :delete, class: "dropdown-item" %>
+          </li>
+        </ul>
+      </div>
+    <% end %>
   </div>
 </div>
-

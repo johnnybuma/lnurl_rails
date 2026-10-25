@@ -1,86 +1,96 @@
-<div id="d3-chart-container" style="width:100%; height:1000px;"></div>
-
-
-
+<div id="d3-chart-container" style="width:100%; min-height:420px;" data-chart-data="<%= ERB::Util.html_escape((@chart_data || []).to_json) %>">
+  <% if @chart_data.blank? %>
+    <p class="text-muted mb-0">No block history in this range yet. Run <code>save_all_blocks.rb</code> to backfill, or widen the range after data exists.</p>
+  <% end %>
+</div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Replace with your actual chartData
-        var chartData = <%= @chart_data %>;
+  (function () {
+    function drawBlockChart(root) {
+      if (typeof d3 === "undefined") return;
 
-        var margin = { top: 20, right: 160, bottom: 30, left: 50 },
-          width = 960 - margin.left - margin.right,
-          height = 500 - margin.top - margin.bottom;
+      var container = root.querySelector
+        ? root.querySelector("#d3-chart-container") || root
+        : document.getElementById("d3-chart-container");
+      if (!container) return;
 
-        var svg = d3.select("#d3-chart-container")
-          .append("svg")
-          .attr("width", width + margin.left + margin.right)
-          .attr("height", height + margin.top + margin.bottom)
-          .append("g")
-          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      var raw = container.getAttribute("data-chart-data") || "[]";
+      var chartData;
+      try {
+        chartData = JSON.parse(raw);
+      } catch (e) {
+        chartData = [];
+      }
 
-        // X scale and axis
-        var x = d3.scaleLinear()
-          .domain(d3.extent(chartData, function(d) { return d[0]; }))
-          .range([0, width]);
-        svg.append("g")
-          .attr("transform", "translate(0," + height + ")")
-          .call(d3.axisBottom(x));
+      // Clear previous SVG
+      d3.select(container).selectAll("svg").remove();
 
-        // Y scales and axes for the three datasets
-        var y1 = d3.scaleLinear()
-          .domain([0, d3.max(chartData, function(d) { return d[1]; })])
-          .range([height, 0]);
-        svg.append("g")
-          .call(d3.axisLeft(y1));
+      var loading = document.getElementById("loadingIndicator");
+      if (loading) loading.style.display = "none";
 
-        var y2 = d3.scaleLinear()
-          .domain([0, d3.max(chartData, function(d) { return d[2]; })])
-          .range([height, 0]);
-        svg.append("g")
-          .attr("transform", "translate( " + width + ", 0 )")
-          .call(d3.axisRight(y2));
+      if (!chartData.length) return;
 
-        var y3 = d3.scaleLinear()
-          .domain([0, d3.max(chartData, function(d) { return d[3]; })])
-          .range([height, 0]);
-        svg.append("g")
-          .attr("transform", "translate( " + (width + margin.right / 2) + ", 0 )")
-          .call(d3.axisRight(y3));
+      var margin = { top: 20, right: 160, bottom: 40, left: 60 };
+      var width = Math.max(320, (container.clientWidth || 960) - margin.left - margin.right);
+      var height = 420 - margin.top - margin.bottom;
 
-        // Line generators for each dataset
-        var line1 = d3.line()
-          .x(function(d) { return x(d[0]); })
-          .y(function(d) { return y1(d[1]); });
+      var svg = d3.select(container)
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        var line2 = d3.line()
-          .x(function(d) { return x(d[0]); })
-          .y(function(d) { return y2(d[2]); });
+      var x = d3.scaleLinear()
+        .domain(d3.extent(chartData, function (d) { return d[0]; }))
+        .range([0, width]);
+      svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x));
 
-        var line3 = d3.line()
-          .x(function(d) { return x(d[0]); })
-          .y(function(d) { return y3(d[3]); });
+      var y1 = d3.scaleLinear()
+        .domain([0, d3.max(chartData, function (d) { return d[1]; }) || 1])
+        .range([height, 0]);
+      svg.append("g").call(d3.axisLeft(y1));
 
-        // Drawing lines for each dataset
-        svg.append("path")
-          .datum(chartData)
-          .attr("class", "line")
-          .style("stroke", "blue")
-          .attr("d", line1);
+      var y2 = d3.scaleLinear()
+        .domain([0, d3.max(chartData, function (d) { return d[2]; }) || 1])
+        .range([height, 0]);
+      svg.append("g")
+        .attr("transform", "translate(" + width + ",0)")
+        .call(d3.axisRight(y2));
 
-        svg.append("path")
-          .datum(chartData)
-          .attr("class", "line")
-          .style("stroke", "green")
-          .attr("d", line2);
+      var y3 = d3.scaleLinear()
+        .domain([0, d3.max(chartData, function (d) { return d[3]; }) || 1])
+        .range([height, 0]);
+      svg.append("g")
+        .attr("transform", "translate(" + (width + margin.right / 2) + ",0)")
+        .call(d3.axisRight(y3));
 
-        svg.append("path")
-          .datum(chartData)
-          .attr("class", "line")
-          .style("stroke", "red")
-          .attr("d", line3);
+      var line1 = d3.line().x(function (d) { return x(d[0]); }).y(function (d) { return y1(d[1]); });
+      var line2 = d3.line().x(function (d) { return x(d[0]); }).y(function (d) { return y2(d[2]); });
+      var line3 = d3.line().x(function (d) { return x(d[0]); }).y(function (d) { return y3(d[3]); });
+
+      svg.append("path").datum(chartData).attr("fill", "none").style("stroke", "blue").attr("d", line1);
+      svg.append("path").datum(chartData).attr("fill", "none").style("stroke", "green").attr("d", line2);
+      svg.append("path").datum(chartData).attr("fill", "none").style("stroke", "red").attr("d", line3);
+    }
+
+    function onReady() {
+      drawBlockChart(document);
+    }
+
+    document.addEventListener("DOMContentLoaded", onReady);
+    document.addEventListener("turbo:load", onReady);
+    document.addEventListener("turbo:frame-load", function (event) {
+      if (event.target && event.target.id === "block_chart") {
+        drawBlockChart(event.target);
+      }
     });
 
+    // Immediate draw when this partial is injected into a frame
+    if (document.readyState !== "loading") {
+      onReady();
+    }
+  })();
 </script>
-
-

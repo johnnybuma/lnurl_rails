@@ -1,0 +1,264 @@
+<%= turbo_stream_from "wallets_index_user_#{current_user.id}" %>
+
+<div class="container-fluid mt-4" id="wallets-index">
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div>
+      <h1 class="h3 mb-1">Wallets</h1>
+      <p class="text-muted small mb-0">
+        Index: batch import + global actions. Each wallet has its own page for metrics/RPC.
+        Network: <code><%= @network || "—" %></code>
+      </p>
+    </div>
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+      <%= render "wallets/job_status", status: "idle", message: "Idle" %>
+      <%= link_to "UTXO scan only", utxo_scan_path, class: "btn btn-outline-success btn-sm" %>
+      <%= link_to "Refresh", wallets_path, class: "btn btn-outline-secondary btn-sm",
+            data: { turbo: true } %>
+    </div>
+  </div>
+
+  <%= render "wallets/flash", dom_id: "wallets_index_flash" %>
+
+  <% unless @wallet_rpc_available %>
+    <div class="alert alert-warning">
+      <strong>Wallet RPC unavailable.</strong>
+      Enable wallets on bitcoind (remove <code>disablewallet=1</code>), then refresh.
+    </div>
+  <% end %>
+
+  <%# —— Live log (global, always visible) —— %>
+  <div class="card mb-3 shadow-sm" id="wallets-index-live-log">
+    <div class="card-header d-flex justify-content-between align-items-center py-2">
+      <span class="fw-semibold"><i class="bi bi-terminal me-1"></i> Live status log</span>
+      <span class="badge text-bg-dark font-monospace small">wallets_index_user_<%= current_user.id %></span>
+    </div>
+    <div class="card-body py-2" id="wallets_index_log_scroll" style="max-height: 220px; overflow: auto; background: #0d1117;">
+      <div id="wallets_index_log" class="text-light">
+        <%= render "shared/log_status", message: "Ready. Submit any action via Turbo — progress streams here." %>
+      </div>
+    </div>
+  </div>
+
+  <%# —— Collapsible action panels —— %>
+  <div class="accordion mb-4" id="walletsActionsAccordion">
+    <%# Batch import %>
+    <div class="accordion-item border-primary" id="batch-import">
+      <h2 class="accordion-header" id="headingBatch">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseBatch" aria-expanded="true" aria-controls="collapseBatch">
+          <span class="me-2">Batch import — ALL formats</span>
+          <span class="badge text-bg-primary">
+            Next: <%= @next_auto_wallet_name || "nodeviewWallet01" %>
+          </span>
+        </button>
+      </h2>
+      <div id="collapseBatch" class="accordion-collapse collapse show"
+           aria-labelledby="headingBatch" data-bs-parent="#walletsActionsAccordion">
+        <div class="accordion-body">
+          <div class="alert alert-success py-2 small mb-3">
+            <strong>Only import UI.</strong>
+            Paste anything (one per line). Auto wallet
+            <code><%= @next_auto_wallet_name || "nodeviewWallet01" %></code>
+            · label = wallet name · <strong>rescan OFF</strong> · auto UTXO → Postgres.
+            Submits via <strong>Turbo Stream</strong> — request returns immediately; watch the live log.
+          </div>
+          <ul class="small text-muted mb-3">
+            <li><strong>Private keys</strong> — WIF/hex → BIP84 primary <code>m/84'/0'/0'/0/0</code> + gap</li>
+            <li><strong>Hex pubkeys</strong> — 02/03/04… → <code>importpubkey</code></li>
+            <li><strong>zpub / xpub</strong> — HD expand receive + change</li>
+            <li><strong>Addresses</strong> — 1… / 3… / bc1… → <code>importaddress</code></li>
+          </ul>
+          <%= form_with url: batch_import_wallets_path, method: :post,
+                        html: { autocomplete: "off", id: "form-batch-import" },
+                        data: { turbo: true, turbo_stream: true } do %>
+            <%= hidden_field_tag :batch, "1" %>
+            <%= hidden_field_tag :rescan, "0" %>
+            <%= hidden_field_tag :auto_utxo_scan, "1" %>
+            <%= hidden_field_tag :compressed, "1" %>
+            <div class="mb-3">
+              <%= label_tag :material, "Keys / pubkeys / xpubs / addresses (one per line)", class: "form-label" %>
+              <%= text_area_tag :material, nil, class: "form-control font-monospace", rows: 10,
+                    required: true, spellcheck: false, autocomplete: "off",
+                    placeholder: "Kx… or Lx… or 64-char hex private key\nzpub6qNsL…\n02ab12…\nbc1q…\n# comments ok" %>
+            </div>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+              <%= submit_tag "Import ALL → #{@next_auto_wallet_name || "nodeviewWallet01"}",
+                    class: "btn btn-primary btn-lg",
+                    data: {
+                      turbo_submits_with: "Importing…",
+                      turbo_confirm: "Create #{@next_auto_wallet_name}, import ALL pasted material (rescan OFF), auto UTXO → Postgres? Live log will stream progress."
+                    } %>
+              <span class="text-muted small">
+                Wallet &amp; label: <code><%= @next_auto_wallet_name || "nodeviewWallet01" %></code>
+              </span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <%# Rescan ALL UTXO %>
+    <div class="accordion-item border-success" id="rescan-all-utxo">
+      <h2 class="accordion-header" id="headingRescan">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseRescan" aria-expanded="false" aria-controls="collapseRescan">
+          <span class="me-2">Rescan ALL UTXO only</span>
+          <span class="badge text-bg-success">scantxoutset · no chain rescan</span>
+        </button>
+      </h2>
+      <div id="collapseRescan" class="accordion-collapse collapse"
+           aria-labelledby="headingRescan" data-bs-parent="#walletsActionsAccordion">
+        <div class="accordion-body">
+          <p class="small text-muted mb-3">
+            Walks every known wallet, runs node <code>scantxoutset</code>, updates
+            <strong>last balances in Postgres</strong>. No Core wallet rescan, no import.
+            Runs in the background over Turbo — watch the live log.
+          </p>
+          <%= button_to "Rescan ALL wallets (UTXO only) → Postgres",
+                        rescan_all_utxos_wallets_path,
+                        method: :post,
+                        class: "btn btn-success",
+                        form: { data: { turbo: true, turbo_stream: true } },
+                        data: {
+                          turbo_submits_with: "Scanning…",
+                          turbo_confirm: "scantxoutset for all wallets and write last balances to Postgres? No chain rescan."
+                        } %>
+        </div>
+      </div>
+    </div>
+
+    <%# Refill ALL private keys %>
+    <div class="accordion-item border-info" id="refill-all">
+      <h2 class="accordion-header" id="headingRefill">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseRefill" aria-expanded="false" aria-controls="collapseRefill">
+          <span class="me-2">Refill ALL private keys</span>
+          <span class="badge text-bg-info">dumpprivkey → HD expand → UTXO</span>
+        </button>
+      </h2>
+      <div id="collapseRefill" class="accordion-collapse collapse"
+           aria-labelledby="headingRefill" data-bs-parent="#walletsActionsAccordion">
+        <div class="accordion-body">
+          <p class="small text-muted mb-3">
+            For every wallet: dumpprivkey → generate pubkeys (BIP84/49/44) → import scripts + UTXO scan.
+            WIF never saved to DB. Background Turbo job — live log streams progress.
+          </p>
+          <%= button_to "Refill ALL private keys",
+                        refill_all_private_keys_wallets_path,
+                        method: :post,
+                        class: "btn btn-info",
+                        form: { data: { turbo: true, turbo_stream: true } },
+                        data: {
+                          turbo_submits_with: "Refilling…",
+                          turbo_confirm: "For every wallet: dumpprivkey → generate pubkeys → fill scripts + UTXO scan? WIF never saved to DB."
+                        } %>
+        </div>
+      </div>
+    </div>
+
+    <%# Create / open helpers %>
+    <div class="accordion-item" id="wallet-helpers">
+      <h2 class="accordion-header" id="headingHelpers">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseHelpers" aria-expanded="false" aria-controls="collapseHelpers">
+          Create empty wallet · Open existing
+        </button>
+      </h2>
+      <div id="collapseHelpers" class="accordion-collapse collapse"
+           aria-labelledby="headingHelpers" data-bs-parent="#walletsActionsAccordion">
+        <div class="accordion-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <h3 class="h6">Create empty wallet</h3>
+              <p class="small text-muted">
+                Leave blank for <code><%= @next_auto_wallet_name || "nodeviewWallet01" %></code>.
+              </p>
+              <%= form_with url: wallets_path, method: :post,
+                            data: { turbo: true, turbo_stream: true } do %>
+                <div class="mb-2">
+                  <%= label_tag :name, "Name (optional)", class: "form-label small" %>
+                  <%= text_field_tag :name, nil, class: "form-control form-control-sm",
+                        pattern: "[^/\\s]*", placeholder: @next_auto_wallet_name, autocomplete: "off" %>
+                </div>
+                <%= submit_tag "Create & open", class: "btn btn-outline-primary btn-sm",
+                      data: { turbo_submits_with: "Creating…" } %>
+              <% end %>
+            </div>
+            <div class="col-md-6">
+              <h3 class="h6">Open existing wallet</h3>
+              <div class="mb-2">
+                <%= label_tag :load_name, "Wallet name", class: "form-label small" %>
+                <%= text_field_tag :load_name, nil, class: "form-control form-control-sm",
+                      list: "wallet_dir_list", placeholder: "nodeviewWallet01",
+                      id: "load_name", autocomplete: "off" %>
+                <datalist id="wallet_dir_list">
+                  <% Array(@wallet_dir_names).each do |n| %>
+                    <option value="<%= n %>"></option>
+                  <% end %>
+                </datalist>
+              </div>
+              <button type="button" class="btn btn-outline-primary btn-sm" id="btn-open-wallet">
+                Open wallet page
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# —— Wallets table —— %>
+  <div class="card shadow-sm mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span class="fw-semibold">All wallets</span>
+      <span class="text-muted small">
+        Loaded: <%= Array(@loaded_wallets).size %> ·
+        Known: <%= Array(@wallet_summaries).size %>
+      </span>
+    </div>
+    <div class="card-body p-0" id="wallets_table_wrap">
+      <%= render "wallets/wallets_table", wallet_summaries: @wallet_summaries %>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  function bindIndex() {
+    var root = document.getElementById("wallets-index");
+    if (!root) return;
+
+    var log = document.getElementById("wallets_index_log");
+    var scroll = document.getElementById("wallets_index_log_scroll");
+    if (log && scroll && typeof MutationObserver !== "undefined" && root.dataset.logBound !== "1") {
+      root.dataset.logBound = "1";
+      new MutationObserver(function () { scroll.scrollTop = scroll.scrollHeight; })
+        .observe(log, { childList: true, subtree: true });
+    }
+
+    var btn = document.getElementById("btn-open-wallet");
+    var input = document.getElementById("load_name");
+    if (btn && input && btn.dataset.bound !== "1") {
+      btn.dataset.bound = "1";
+      btn.addEventListener("click", function () {
+        var name = (input.value || "").trim();
+        if (!name) { input.focus(); return; }
+        // Turbo visit keeps SPA navigation
+        if (window.Turbo) {
+          window.Turbo.visit("/wallets/" + encodeURIComponent(name));
+        } else {
+          window.location.href = "/wallets/" + encodeURIComponent(name);
+        }
+      });
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          btn.click();
+        }
+      });
+    }
+  }
+  document.addEventListener("DOMContentLoaded", bindIndex);
+  document.addEventListener("turbo:load", bindIndex);
+})();
+</script>

@@ -1,0 +1,12 @@
+<%= turbo_stream.replace "chain_datum_panel" do %>
+  <div id="chain_datum_panel" class="border rounded p-3 bg-light">
+    <p class="text-success mb-3">Chain datum deleted.</p>
+    <p class="mb-3">
+      <%= link_to "Create another", new_chain_datum_path, class: "btn btn-primary btn-sm" %>
+      <%= link_to "Back to index", chain_data_path, class: "btn btn-outline-secondary btn-sm" %>
+    </p>
+    <%= render "form", chain_datum: ChainDatum.new %>
+  </div>
+<% end %>
+
+<%= turbo_stream.remove dom_id(@chain_datum) %>

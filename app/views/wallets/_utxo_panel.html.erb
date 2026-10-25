@@ -1,0 +1,51 @@
+<div id="wallet_utxo_panel">
+  <% if utxo_scan.present? %>
+    <dl class="row small mb-2">
+      <% if utxo_scan[:scope].present? %>
+        <dt class="col-sm-4">Scope</dt>
+        <dd class="col-sm-8"><span class="badge text-bg-secondary"><%= utxo_scan[:scope] %></span></dd>
+      <% end %>
+      <dt class="col-sm-4">Total amount</dt>
+      <dd class="col-sm-8"><strong><%= utxo_scan[:total_amount] %></strong> BTC</dd>
+      <dt class="col-sm-4">UTXOs</dt>
+      <dd class="col-sm-8"><%= utxo_scan[:unspents]&.size || 0 %> (txouts: <%= utxo_scan[:txouts] %>)</dd>
+      <dt class="col-sm-4">Height</dt>
+      <dd class="col-sm-8"><%= utxo_scan[:height] %></dd>
+    </dl>
+    <% if utxo_scan[:unspents].present? %>
+      <div class="table-responsive" style="max-height: 320px; overflow: auto;">
+        <table class="table table-sm mb-0">
+          <thead class="table-light sticky-top">
+            <tr>
+              <th>txid</th>
+              <th>vout</th>
+              <th class="text-end">amount</th>
+              <th>height</th>
+              <th>desc</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% utxo_scan[:unspents].first(200).each do |u| %>
+              <tr>
+                <td class="font-monospace small text-break"><%= u[:txid] %></td>
+                <td><%= u[:vout] %></td>
+                <td class="text-end"><%= u[:amount] %></td>
+                <td><%= u[:height] %></td>
+                <td class="font-monospace small text-break"><%= u[:desc].to_s.truncate(40) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <% if utxo_scan[:unspents].size > 200 %>
+        <p class="small text-muted mb-0 mt-1">Showing first 200 of <%= utxo_scan[:unspents].size %> UTXOs.</p>
+      <% end %>
+    <% end %>
+  <% else %>
+    <p class="text-muted small mb-0">
+      Run a wallet UTXO scan, or use
+      <%= link_to "scan-only", utxo_scan_path %>
+      (no import / no Postgres).
+    </p>
+  <% end %>
+</div>

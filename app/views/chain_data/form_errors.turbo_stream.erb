@@ -1,0 +1,6 @@
+<%= turbo_stream.replace "chain_datum_panel" do %>
+  <div id="chain_datum_panel" class="border rounded p-3 bg-white">
+    <h2 class="h5 mb-3"><%= @chain_datum.persisted? ? "Edit" : "New" %> chain datum</h2>
+    <%= render "form", chain_datum: @chain_datum %>
+  </div>
+<% end %>

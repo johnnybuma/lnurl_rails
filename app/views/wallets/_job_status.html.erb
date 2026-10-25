@@ -1,0 +1,13 @@
+<%# locals: status ("idle"|"running"|"done"|"error"), message %>
+<%
+  status = local_assigns.fetch(:status, "idle").to_s
+  message = local_assigns.fetch(:message, "Idle").to_s
+  badge =
+    case status
+    when "running" then "text-bg-warning"
+    when "done" then "text-bg-success"
+    when "error" then "text-bg-danger"
+    else "text-bg-secondary"
+    end
+%>
+<span id="wallets_index_job_status" class="badge <%= badge %>" title="<%= message %>"><%= message.truncate(48) %></span>

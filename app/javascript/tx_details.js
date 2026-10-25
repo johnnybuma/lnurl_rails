@@ -1,24 +1,17 @@
-$(document).on('ready load turbo:frame-load',function() {
-    $(document).on('click', '.view-transaction-link', function(event) {
+// Full-page navigation for transaction detail links (no turbo_frames).
 
-        event.preventDefault();
-        event.stopPropagation(); // Add this line to stop event propagation
+document.addEventListener("click", function (event) {
+  var link = event.target.closest("a.view-transaction-link");
+  if (!link) return;
 
+  var txId = link.dataset.txId || link.getAttribute("data-tx-id");
+  if (!txId) return;
 
-        var txId = $(this).data('txId');
-        var url = `/block_histories/transactions/${txId}`; // Updated URL
+  // Prefer the href when present; otherwise build lookup URL.
+  if (link.getAttribute("href") && link.getAttribute("href") !== "#") {
+    return; // allow normal / Turbo Drive navigation
+  }
 
-        // Fetch and display the transaction details
-        $.ajax({
-            url: url,
-            type: 'GET',
-            success: function(response) {
-                var content = $(response).find('#raw_transaction_details_wrapper').html();
-                $('#testTxDetails').html(content);
-            },
-            error: function(error) {
-                console.error('Error:', error);
-            }
-        });
-    });
+  event.preventDefault();
+  window.location.href = "/explorer/raw_transaction?tx_id=" + encodeURIComponent(txId);
 });

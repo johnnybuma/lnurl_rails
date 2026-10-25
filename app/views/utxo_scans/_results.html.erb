@@ -1,0 +1,106 @@
+<div id="utxo_scan_results">
+  <% if build_errors.present? %>
+    <div class="alert alert-warning py-2 small">
+      <strong><%= build_errors.size %></strong> line(s) skipped:
+      <ul class="mb-0 mt-1">
+        <% build_errors.first(15).each do |e| %>
+          <li>L<%= e[:line] %> (<%= e[:preview] %>): <%= e[:message] %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% if scan_result.present? %>
+    <div class="row g-2 mb-3">
+      <div class="col-md-4">
+        <div class="border rounded p-3 h-100 bg-light">
+          <div class="text-muted small">Total balance</div>
+          <div class="fs-4 fw-semibold"><%= number_with_precision(scan_result[:total_amount], precision: 8) %> <span class="fs-6">BTC</span></div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="border rounded p-3 h-100 bg-light">
+          <div class="text-muted small">UTXOs found</div>
+          <div class="fs-4 fw-semibold"><%= scan_result[:unspents]&.size || 0 %></div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="border rounded p-3 h-100 bg-light">
+          <div class="text-muted small">Chain height / descriptors</div>
+          <div class="fs-5 fw-semibold"><%= scan_result[:height] || "—" %> <span class="text-muted fs-6">/ <%= scan_result[:descriptor_count] %></span></div>
+        </div>
+      </div>
+    </div>
+
+    <% if scan_result[:totals].present? %>
+      <h2 class="h6">Balances by address / key</h2>
+      <div class="table-responsive mb-3" style="max-height: 280px; overflow: auto;">
+        <table class="table table-sm table-hover align-middle mb-0">
+          <thead class="table-light sticky-top">
+            <tr>
+              <th>Address / key</th>
+              <th class="text-end">UTXOs</th>
+              <th class="text-end">Amount (BTC)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% scan_result[:totals].each do |row| %>
+              <tr>
+                <td class="font-monospace small text-break"><%= row[:label] %></td>
+                <td class="text-end"><%= row[:count] %></td>
+                <td class="text-end fw-semibold"><%= number_with_precision(row[:amount], precision: 8) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+          <tfoot>
+            <tr class="table-light">
+              <th>Total</th>
+              <th class="text-end"><%= scan_result[:unspents]&.size || 0 %></th>
+              <th class="text-end"><%= number_with_precision(scan_result[:total_amount], precision: 8) %></th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    <% end %>
+
+    <h2 class="h6">UTXO list</h2>
+    <% if scan_result[:unspents].present? %>
+      <div class="table-responsive" style="max-height: 420px; overflow: auto;">
+        <table class="table table-sm table-striped align-middle mb-0">
+          <thead class="table-light sticky-top">
+            <tr>
+              <th>#</th>
+              <th>txid</th>
+              <th>vout</th>
+              <th class="text-end">amount</th>
+              <th>height</th>
+              <th>descriptor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% scan_result[:unspents].each_with_index do |u, i| %>
+              <tr>
+                <td class="text-muted small"><%= i + 1 %></td>
+                <td class="font-monospace small text-break" style="max-width: 14rem;"><%= u[:txid] %></td>
+                <td><%= u[:vout] %></td>
+                <td class="text-end"><%= number_with_precision(u[:amount], precision: 8) %></td>
+                <td><%= u[:height] %></td>
+                <td class="font-monospace small text-break" style="max-width: 16rem;">
+                  <%# Never show raw combo(WIF) — redact if present %>
+                  <% d = u[:desc].to_s %>
+                  <%= d.gsub(/combo\(([5KL9c][1-9A-HJ-NP-Za-km-z]{20,})\)/) { "combo(#{$1[0, 4]}…#{$1[-4, 4]})" } %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="text-muted mb-0">No UTXOs found for the given material (balance is zero on the UTXO set).</p>
+    <% end %>
+  <% else %>
+    <p class="text-muted mb-0">
+      Run a scan to list UTXO balances here. This page never imports keys or creates a wallet.
+    </p>
+  <% end %>
+</div>

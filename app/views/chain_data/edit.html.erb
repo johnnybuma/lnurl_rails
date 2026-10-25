@@ -1,10 +1,9 @@
-<h1>Editing chain datum</h1>
-
-<%= render "form", chain_datum: @chain_datum %>
-
-<br>
-
-<div>
-  <%= link_to "Show this chain datum", @chain_datum %> |
-  <%= link_to "Back to chain data", chain_data_path %>
+<div class="container-fluid mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">Edit chain datum #<%= @chain_datum.id %></h1>
+    <%= link_to "← Back", chain_datum_path(@chain_datum), class: "btn btn-outline-secondary btn-sm" %>
+  </div>
+  <div id="chain_datum_panel" class="border rounded p-3 bg-white">
+    <%= render "form", chain_datum: @chain_datum %>
+  </div>
 </div>

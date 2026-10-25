@@ -1,0 +1,16 @@
+<%= turbo_stream.replace "chain_datum_panel" do %>
+  <div id="chain_datum_panel" class="border rounded p-3 bg-white">
+    <p class="text-success">Chain datum was successfully created.</p>
+    <h2 class="h5 mb-3">Chain datum #<%= @chain_datum.id %></h2>
+    <%= render @chain_datum %>
+    <div class="d-flex flex-wrap gap-2 mt-3">
+      <%= link_to "Edit", edit_chain_datum_path(@chain_datum), class: "btn btn-primary btn-sm" %>
+      <%= link_to "New", new_chain_datum_path, class: "btn btn-outline-primary btn-sm" %>
+      <%= link_to "View full page", chain_datum_path(@chain_datum), class: "btn btn-outline-secondary btn-sm" %>
+    </div>
+  </div>
+<% end %>
+
+<%= turbo_stream.prepend "chain_data_records" do %>
+  <%= render partial: "block_histories/chain_data_rows", locals: { records: [@chain_datum] } %>
+<% end %>

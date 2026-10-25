@@ -43,9 +43,11 @@ class ChainDataController < ApplicationController
     respond_to do |format|
       if @chain_datum.save
         format.html { redirect_to chain_datum_url(@chain_datum), notice: "Chain datum was successfully created." }
+        format.turbo_stream
         format.json { render :show, status: :created, location: @chain_datum }
       else
         format.html { render :new, status: :unprocessable_entity }
+        format.turbo_stream { render :form_errors, status: :unprocessable_entity }
         format.json { render json: @chain_datum.errors, status: :unprocessable_entity }
       end
     end
@@ -56,9 +58,11 @@ class ChainDataController < ApplicationController
     respond_to do |format|
       if @chain_datum.update(chain_datum_params)
         format.html { redirect_to chain_datum_url(@chain_datum), notice: "Chain datum was successfully updated." }
+        format.turbo_stream
         format.json { render :show, status: :ok, location: @chain_datum }
       else
         format.html { render :edit, status: :unprocessable_entity }
+        format.turbo_stream { render :form_errors, status: :unprocessable_entity }
         format.json { render json: @chain_datum.errors, status: :unprocessable_entity }
       end
     end
@@ -70,18 +74,18 @@ class ChainDataController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to chain_data_url, notice: "Chain datum was successfully destroyed." }
+      format.turbo_stream
       format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_chain_datum
-      @chain_datum = ChainDatum.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def chain_datum_params
-      params.fetch(:chain_datum, {})
-    end
+  def set_chain_datum
+    @chain_datum = ChainDatum.find(params[:id])
+  end
+
+  def chain_datum_params
+    params.fetch(:chain_datum, {}).permit(:key, :value)
+  end
 end

@@ -1,0 +1,16 @@
+<% records.each do |record| %>
+  <tr id="<%= dom_id(record) %>">
+    <td><%= record.id %></td>
+    <td class="text-break"><%= record.key %></td>
+    <td class="text-break small"><%= truncate(record.value.to_s, length: 48) %></td>
+    <td class="text-nowrap text-end">
+      <%= link_to "Show", chain_datum_path(record), class: "btn btn-sm btn-outline-secondary" %>
+      <%= link_to "Edit", edit_chain_datum_path(record), class: "btn btn-sm btn-outline-primary" %>
+    </td>
+  </tr>
+<% end %>
+<% if records.blank? %>
+  <tr>
+    <td colspan="4" class="text-muted text-center py-3">No chain data records yet.</td>
+  </tr>
+<% end %>

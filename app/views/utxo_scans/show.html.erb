@@ -1,0 +1,153 @@
+<%= turbo_stream_from "utxo_scan_user_#{current_user.id}" %>
+
+<div class="container-fluid mt-4" id="utxo-scan-page">
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div>
+      <h1 class="h3 mb-1">UTXO scan only</h1>
+      <p class="text-muted small mb-0">
+        <strong>No wallet · no import · no Postgres.</strong>
+        Pasted keys are converted to descriptors and scanned with node
+        <code>scantxoutset</code>. Results appear in the table below only.
+      </p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to "← Wallets", wallets_path, class: "btn btn-outline-secondary btn-sm" %>
+    </div>
+  </div>
+
+  <div id="utxo_scan_flash">
+    <%= render "flash" %>
+  </div>
+
+  <div class="alert alert-warning small">
+    <strong>Safety:</strong> private keys never leave this request (filtered in logs).
+    Nothing is written to bitcoind wallets or the application database.
+    Network: <code><%= @network || "main" %></code>
+  </div>
+
+  <div class="card mb-3 shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center py-2">
+      <span class="fw-semibold"><i class="bi bi-terminal me-1"></i> Live scan log</span>
+      <span class="d-flex align-items-center gap-2">
+        <span class="badge text-bg-secondary" id="utxo_scan_conn" title="ActionCable">cable…</span>
+        <span class="badge text-bg-dark font-monospace small">utxo_scan_user_<%= current_user.id %></span>
+      </span>
+    </div>
+    <div class="card-body py-2" id="utxo_scan_log_scroll" style="max-height: 220px; overflow: auto; background: #0d1117;">
+      <div id="utxo_scan_log" class="text-light">
+        <%= render "shared/log_status", message: "Ready. Paste material and run scan-only…" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-xl-5">
+      <div class="card border-success mb-3">
+        <div class="card-header bg-success text-white d-flex justify-content-between">
+          <span>Scan material</span>
+          <span class="badge text-bg-light text-success">scantxoutset only</span>
+        </div>
+        <div class="card-body">
+          <p class="small text-muted mb-2">One item per line. Comments with <code>#</code> ok.</p>
+          <ul class="small text-muted">
+            <li><strong>Private keys</strong> → <code>combo(WIF)</code> (all standard scripts)</li>
+            <li><strong>Hex pubkeys</strong> → pkh / wpkh / sh(wpkh)</li>
+            <li><strong>xpub / ypub / zpub</strong> → gap expand + addresses</li>
+            <li><strong>Addresses</strong> → <code>addr(…)</code></li>
+          </ul>
+
+          <%= form_with url: utxo_scan_path, method: :post, html: { autocomplete: "off", id: "form-scan-only" },
+                        data: { turbo_stream: true } do %>
+            <div class="mb-3">
+              <%= label_tag :mode, "Interpret as", class: "form-label" %>
+              <%= select_tag :mode,
+                    options_for_select(
+                      [
+                        ["Auto-detect (recommended)", "auto"],
+                        ["Private keys only", "private_keys"],
+                        ["Public keys / xpubs / addresses only", "public_keys"]
+                      ],
+                      @mode || "auto"
+                    ),
+                    class: "form-select" %>
+            </div>
+            <div class="mb-3">
+              <%= label_tag :material, "Keys / pubkeys / xpubs / addresses", class: "form-label" %>
+              <%= text_area_tag :material, nil, class: "form-control font-monospace", rows: 12,
+                    required: true, spellcheck: false, autocomplete: "off",
+                    placeholder: "K… or L… or hex private key\nzpub6qNsL…\n02ab…\nbc1q…" %>
+            </div>
+            <div class="form-check mb-2">
+              <%= hidden_field_tag :compressed, "0", id: nil %>
+              <%= check_box_tag :compressed, "1", @compressed != false, class: "form-check-input", id: "scan_compressed" %>
+              <%= label_tag :scan_compressed, "Compressed (hex private keys → WIF)", class: "form-check-label" %>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <%= label_tag :derive_receive, "xpub receive gap", class: "form-label" %>
+                <%= number_field_tag :derive_receive, @derive_receive || 50, min: 0, max: 500, class: "form-control" %>
+              </div>
+              <div class="col-6">
+                <%= label_tag :derive_change, "xpub change gap", class: "form-label" %>
+                <%= number_field_tag :derive_change, @derive_change || 20, min: 0, max: 500, class: "form-control" %>
+              </div>
+            </div>
+            <%= submit_tag "Scan UTXO set (no import)", class: "btn btn-success w-100",
+                  data: { turbo_confirm: "Scan only — nothing will be imported or saved. Continue?" } %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-7">
+      <div class="card shadow-sm">
+        <div class="card-header fw-semibold">Results</div>
+        <div class="card-body">
+          <%= render "results", scan_result: @scan_result, build_errors: @build_errors %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  function bind() {
+    var log = document.getElementById("utxo_scan_log");
+    var scroll = document.getElementById("utxo_scan_log_scroll");
+    var badge = document.getElementById("utxo_scan_conn");
+    if (!log || log.dataset.bound === "1") return;
+    log.dataset.bound = "1";
+
+    if (scroll && typeof MutationObserver !== "undefined") {
+      new MutationObserver(function () {
+        scroll.scrollTop = scroll.scrollHeight;
+      }).observe(log, { childList: true, subtree: true });
+    }
+
+    // Reflect ActionCable / Turbo stream connection for live log
+    if (badge) {
+      function setBadge(ok, text) {
+        badge.textContent = text;
+        badge.className = "badge " + (ok ? "text-bg-success" : "text-bg-warning");
+      }
+      document.addEventListener("turbo:before-stream-render", function () {
+        setBadge(true, "live");
+      });
+      // Connected subscription elements from turbo-rails
+      var sub = document.querySelector('turbo-cable-stream-source, [data-turbo-stream]');
+      if (window.ActionCable || document.querySelector("turbo-cable-stream-source")) {
+        setBadge(true, "cable on");
+      } else {
+        setBadge(false, "no cable?");
+      }
+      // After a stream message, force scroll
+      document.addEventListener("turbo:before-stream-render", function () {
+        if (scroll) setTimeout(function () { scroll.scrollTop = scroll.scrollHeight; }, 10);
+      });
+    }
+  }
+  document.addEventListener("DOMContentLoaded", bind);
+  document.addEventListener("turbo:load", bind);
+})();
+</script>

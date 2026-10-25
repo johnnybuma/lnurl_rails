@@ -1,0 +1,56 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Users</h1>
+  </div>
+
+  <%= form_with url: users_path, method: :get, local: true, class: "row g-2 mb-4" do %>
+    <div class="col-md-6">
+      <%= text_field_tag :search, params[:search], class: "form-control", placeholder: "Search by username or email" %>
+    </div>
+    <div class="col-auto">
+      <%= submit_tag "Search", class: "btn btn-primary" %>
+    </div>
+    <% if params[:search].present? %>
+      <div class="col-auto">
+        <%= link_to "Clear", users_path, class: "btn btn-outline-secondary" %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @users.each do |user| %>
+              <tr>
+                <td>
+                  <%= image_tag(user.avatar, width: 28, height: 28, class: "rounded-circle me-2") if user.avatar.attached? %>
+                  <%= link_to user.username.presence || "—", user_path(user) %>
+                </td>
+                <td><%= user.email %></td>
+                <td><span class="badge text-bg-secondary"><%= user.role %></span></td>
+                <td class="text-end">
+                  <%= link_to "View", user_path(user), class: "btn btn-sm btn-outline-primary" %>
+                </td>
+              </tr>
+            <% end %>
+            <% if @users.empty? %>
+              <tr>
+                <td colspan="4" class="text-center text-muted py-4">No users found.</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

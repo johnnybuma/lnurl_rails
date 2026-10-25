@@ -1,112 +1,162 @@
-<!-- app/views/block_histories/index.html.erb -->
-<div class="container mt-4">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="card">
-        <div class="card-header">
-          Enter Block Range
-        </div>
-        <div class="card-body">
-            <div class="row">
-              <%= form_with url: block_histories_path, method: :get, class: 'row g-3', id: "blockHistoryForm", data: { turbo_frame: "block_chart" } do %>
+<div class="container-fluid mt-4" id="chart-view-root">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h3 mb-0">Chart View</h1>
+    <div class="btn-group flex-wrap" role="group" aria-label="Toggle panels">
+      <button type="button" class="btn btn-outline-primary btn-sm panel-toggle-btn" data-panel="panel-chart">Chart range</button>
+      <button type="button" class="btn btn-outline-primary btn-sm panel-toggle-btn" data-panel="panel-block-txs">Block transactions</button>
+      <button type="button" class="btn btn-outline-primary btn-sm panel-toggle-btn" data-panel="panel-raw-tx">Raw transaction</button>
+      <button type="button" class="btn btn-outline-secondary btn-sm" id="show-all-panels">Show all panels</button>
+    </div>
+  </div>
 
-            <div class="col-md-6">
-                <%= label_tag :start_block, 'Start Block', class: 'form-label' %>
-                <%= number_field_tag :start_block, params[:start_block], min: 0, class: 'form-control' %>
-              </div>
-              <div class="col-md-6">
-                <%= label_tag :end_block, 'End Block', class: 'form-label' %>
-                <%= number_field_tag :end_block, params[:end_block], min: 0, class: 'form-control' %>
-              </div>
-              <div class="col-12">
-                <%= submit_tag 'Show Chart', class: 'btn btn-primary mt-3 float-start' %>
-                <button type="button" id="loadMore" class="btn btn-primary mt-3 float-end">Load More</button>
-              </div>
-              <% end %>
+  <%# —— Chart range —— %>
+  <div class="mb-3 chart-panel" id="panel-chart">
+    <div class="card">
+      <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <span>Block range chart</span>
+        <span class="small text-muted">
+          DB: <%= number_with_delimiter(@db_count || 0) %> rows
+          <% if @db_min && @db_max %>
+            (heights <%= @db_min %>–<%= @db_max %>)
+          <% end %>
+          · max <%= BlockHistoriesController::MAX_CHART_BLOCKS %> blocks / chart
+        </span>
+      </div>
+      <div class="card-body">
+        <% if @chart_message.present? %>
+          <div class="alert alert-info py-2 small mb-3"><%= @chart_message %></div>
+        <% end %>
+        <% if @chart_capped %>
+          <div class="alert alert-warning py-2 small mb-3">
+            Requested range was too large and was capped to <%= BlockHistoriesController::MAX_CHART_BLOCKS %> blocks.
+          </div>
+        <% end %>
+
+        <%# Full-page GET so range fields + chart all refresh together %>
+        <%= form_with url: block_histories_path, method: :get, local: true, class: "row g-3", id: "blockHistoryForm" do %>
+          <div class="col-md-4">
+            <%= label_tag :start_block, "Start block", class: "form-label" %>
+            <%= number_field_tag :start_block, @start_block, min: 0, class: "form-control", required: true %>
+          </div>
+          <div class="col-md-4">
+            <%= label_tag :end_block, "End block", class: "form-label" %>
+            <%= number_field_tag :end_block, @end_block, min: 0, class: "form-control", required: true %>
+          </div>
+          <div class="col-md-4 d-flex align-items-end gap-2 flex-wrap">
+            <%= submit_tag "Show chart", class: "btn btn-primary" %>
+            <% if @db_max %>
+              <%= link_to "Latest #{BlockHistoriesController::DEFAULT_CHART_BLOCKS}",
+                          block_histories_path(
+                            start_block: [@db_max - BlockHistoriesController::DEFAULT_CHART_BLOCKS + 1, @db_min || 0].max,
+                            end_block: @db_max
+                          ),
+                          class: "btn btn-outline-secondary" %>
+            <% end %>
+          </div>
+          <div class="col-12">
+            <div class="form-text">
+              Max window <strong><%= BlockHistoriesController::MAX_CHART_BLOCKS %></strong> heights.
+              Chart does not load the full archive.
             </div>
-
+          </div>
+        <% end %>
+      </div>
+      <div class="card-body border-top pt-3">
+        <div id="block_chart">
+          <%= render "chart" %>
         </div>
       </div>
     </div>
   </div>
-  <div class="row">
-    <!-- Loading Indicator -->
-    <div id="loadingIndicator" class="text-center" style="display: none;">
-      <div class="ellipsis">
-        <div></div><div></div><div></div><div></div>
+
+  <div class="row g-3">
+    <%# —— Block transactions —— %>
+    <div class="col-lg-6">
+      <div class="h-100 chart-panel" id="panel-block-txs">
+        <div class="card h-100">
+          <div class="card-header">Block transactions (from stored history)</div>
+          <div class="card-body">
+            <%= form_with url: lookup_block_transactions_path, method: :get, local: true, class: "row g-2 mb-3",
+                          data: { turbo: false } do %>
+              <div class="col">
+                <%= label_tag :block_number, "Block number", class: "form-label" %>
+                <%= number_field_tag :block_number, params[:block_number], min: 0, class: "form-control",
+                                    placeholder: "e.g. 800000", required: true %>
+              </div>
+              <div class="col-auto d-flex align-items-end">
+                <%= submit_tag "Load transactions", class: "btn btn-primary" %>
+              </div>
+            <% end %>
+            <p class="text-muted small mb-0">Opens a full page with the block’s stored txids (no turbo frames).</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <style>
-        #loadingIndicator {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-
-        .ellipsis {
-            display: inline-block;
-            position: relative;
-            width: 80px;
-            height: 13px;
-            div {
-                position: absolute;
-                top: 6px;
-                width: 13px;
-                height: 13px;
-                border-radius: 50%;
-                background: #007bff;
-                animation-timing-function: cubic-bezier(0, 1, 1, 0);
-            }
-            div:nth-child(1) { left: 8px; animation: ellipsis1 0.6s infinite; }
-            div:nth-child(2) { left: 8px; animation: ellipsis2 0.6s infinite; }
-            div:nth-child(3) { left: 32px; animation: ellipsis2 0.6s infinite; }
-            div:nth-child(4) { left: 56px; animation: ellipsis3 0.6s infinite; }
-        }
-
-        @keyframes ellipsis1 {
-            0% { transform: scale(0); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes ellipsis2 {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(24px, 0); }
-        }
-
-        @keyframes ellipsis3 {
-            0% { transform: scale(1); }
-            100% { transform: scale(0); }
-        }
-    </style>
-    <!-- end of loading indicator -->
-    <%= turbo_frame_tag "block_chart" do %>
-      <%= render 'chart' %>
-    <% end %>
-
-
-
+    <%# —— Raw transaction —— %>
+    <div class="col-lg-6">
+      <div class="h-100 chart-panel" id="panel-raw-tx">
+        <div class="card h-100">
+          <div class="card-header">Raw transaction (live RPC)</div>
+          <div class="card-body">
+            <%= form_with url: lookup_raw_transaction_path, method: :get, local: true, class: "row g-2 mb-3",
+                          data: { turbo: false } do %>
+              <div class="col">
+                <%= label_tag :tx_id, "Transaction ID", class: "form-label" %>
+                <%= text_field_tag :tx_id, params[:tx_id], class: "form-control font-monospace",
+                                   placeholder: "txid…", required: true, autocomplete: "off" %>
+              </div>
+              <div class="col-auto d-flex align-items-end">
+                <%= submit_tag "Decode tx", class: "btn btn-primary" %>
+              </div>
+            <% end %>
+            <p class="text-muted small mb-0">Full-page decode via <code>getrawtransaction</code>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-
 </div>
 
-
-
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('blockHistoryForm').addEventListener('submit', function() {
-            showLoadingIndicator();
-        });
+(function () {
+  function bindChartView() {
+    var root = document.getElementById("chart-view-root");
+    if (!root || root.dataset.bound === "1") return;
+    root.dataset.bound = "1";
+
+    root.querySelectorAll(".panel-toggle-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var panel = document.getElementById(btn.getAttribute("data-panel"));
+        if (!panel) return;
+        panel.classList.toggle("d-none");
+        btn.classList.toggle("active");
+      });
     });
 
-    function showLoadingIndicator() {
-        document.getElementById('loadingIndicator').style.display = 'block';
+    var showAll = document.getElementById("show-all-panels");
+    if (showAll) {
+      showAll.addEventListener("click", function () {
+        ["panel-chart", "panel-block-txs", "panel-raw-tx"].forEach(function (id) {
+          var panel = document.getElementById(id);
+          if (panel) panel.classList.remove("d-none");
+        });
+        root.querySelectorAll(".panel-toggle-btn").forEach(function (btn) {
+          btn.classList.add("active");
+        });
+      });
     }
 
-    function hideLoadingIndicator() {
-        document.getElementById('loadingIndicator').style.display = 'none';
+    var form = document.getElementById("blockHistoryForm");
+    if (form) {
+      form.addEventListener("submit", function () {
+        var el = document.getElementById("loadingIndicator");
+        if (el) el.style.display = "block";
+      });
     }
+  }
+
+  document.addEventListener("DOMContentLoaded", bindChartView);
+  document.addEventListener("turbo:load", bindChartView);
+})();
 </script>
-

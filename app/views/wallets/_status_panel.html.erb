@@ -1,0 +1,42 @@
+<div id="wallet_status_panel">
+  <% if wallet_info.present? %>
+    <dl class="row mb-0 small">
+      <dt class="col-sm-5">Name</dt>
+      <dd class="col-sm-7 font-monospace"><%= wallet_name %></dd>
+      <dt class="col-sm-5">Wallet balance</dt>
+      <dd class="col-sm-7"><%= balance.nil? ? "—" : "#{balance} BTC" %>
+        <span class="text-muted">(0 without rescan is normal)</span>
+      </dd>
+      <% if balances.is_a?(Hash) %>
+        <dt class="col-sm-5">Mine trusted</dt>
+        <dd class="col-sm-7"><%= balances.dig("mine", "trusted") %></dd>
+        <dt class="col-sm-5">Mine untrusted</dt>
+        <dd class="col-sm-7"><%= balances.dig("mine", "untrusted_pending") %></dd>
+        <dt class="col-sm-5">Watch-only</dt>
+        <dd class="col-sm-7"><%= balances.dig("watchonly", "trusted") || balances.dig("watchonly") %></dd>
+      <% end %>
+      <% %w[walletversion txcount keypoolsize private_keys_enabled descriptors scanning format].each do |key| %>
+        <% next unless wallet_info.key?(key) %>
+        <dt class="col-sm-5"><%= key.humanize %></dt>
+        <dd class="col-sm-7 text-break">
+          <%= wallet_info[key].is_a?(Hash) ? wallet_info[key].to_json : wallet_info[key].inspect %>
+        </dd>
+      <% end %>
+      <dt class="col-sm-5">Network</dt>
+      <dd class="col-sm-7"><code><%= network || "main" %></code></dd>
+      <dt class="col-sm-5">Also loaded</dt>
+      <dd class="col-sm-7 small">
+        <% Array(loaded_wallets).each do |w| %>
+          <%= link_to w, wallet_path(w), class: "me-1 #{'fw-bold' if w.to_s == wallet_name.to_s}" %>
+        <% end %>
+        <%= "none" if Array(loaded_wallets).blank? %>
+      </dd>
+    </dl>
+  <% else %>
+    <p class="text-muted mb-0">
+      Wallet <code><%= wallet_name %></code> is not loaded.
+      Use <strong>Load</strong> above, or return to
+      <%= link_to "all wallets", wallets_path %>.
+    </p>
+  <% end %>
+</div>

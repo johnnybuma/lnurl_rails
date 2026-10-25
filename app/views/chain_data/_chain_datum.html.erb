@@ -1,2 +1,15 @@
-<div id="<%= dom_id chain_datum %>">
+<div id="<%= dom_id(chain_datum) %>">
+  <dl class="row mb-0">
+    <dt class="col-sm-3">ID</dt>
+    <dd class="col-sm-9"><%= chain_datum.id %></dd>
+
+    <dt class="col-sm-3">Key</dt>
+    <dd class="col-sm-9 text-break"><%= chain_datum.key %></dd>
+
+    <dt class="col-sm-3">Value</dt>
+    <dd class="col-sm-9 text-break"><%= chain_datum.value %></dd>
+
+    <dt class="col-sm-3">Updated</dt>
+    <dd class="col-sm-9"><%= chain_datum.updated_at %></dd>
+  </dl>
 </div>

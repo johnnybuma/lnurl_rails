@@ -1,0 +1,317 @@
+<%= turbo_stream_from "wallet_user_#{current_user.id}_#{@wallet_name.to_s.gsub(/[^a-zA-Z0-9_-]/, '_')}" %>
+
+<div class="container-fluid mt-4" id="wallet-page" data-wallet="<%= @wallet_name %>">
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1 small">
+          <li class="breadcrumb-item"><%= link_to "Wallets", wallets_path %></li>
+          <li class="breadcrumb-item active font-monospace" aria-current="page"><%= @wallet_name %></li>
+        </ol>
+      </nav>
+      <h1 class="h3 mb-1">Wallet <code class="fs-4"><%= @wallet_name %></code></h1>
+      <p class="text-muted small mb-0">
+        Metrics · last balances · UTXO scan · RPC actions.
+        <strong>Key import is only on</strong> <%= link_to "Wallets → Batch import", wallets_path %>.
+      </p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to "All wallets", wallets_path, class: "btn btn-outline-secondary btn-sm" %>
+      <%= link_to "Batch import", wallets_path(anchor: "batch-import"), class: "btn btn-primary btn-sm" %>
+      <%= link_to "UTXO scan only", utxo_scan_path, class: "btn btn-success btn-sm" %>
+      <%= button_to "Refresh", refresh_wallet_path(@wallet_name), method: :post,
+                    class: "btn btn-outline-secondary btn-sm",
+                    form: { data: { turbo: true, turbo_stream: true } },
+                    data: { turbo_submits_with: "…" } %>
+      <%= button_to "Load", load_wallet_path(@wallet_name), method: :post,
+                    class: "btn btn-outline-primary btn-sm",
+                    form: { data: { turbo: true, turbo_stream: true } },
+                    data: { turbo_submits_with: "…" } %>
+      <%= button_to "Unload", unload_wallet_path(@wallet_name), method: :post,
+                    class: "btn btn-outline-danger btn-sm",
+                    form: { data: { turbo: true, turbo_stream: true } },
+                    data: {
+                      turbo_confirm: "Unload wallet “#{@wallet_name}”?",
+                      turbo_submits_with: "…"
+                    } %>
+    </div>
+  </div>
+
+  <%= render "flash" %>
+
+  <% unless @wallet_rpc_available %>
+    <div class="alert alert-warning">
+      <strong>Wallet RPC unavailable.</strong>
+      Enable wallets on bitcoind and retry.
+    </div>
+  <% end %>
+
+  <% if @wallet_load_error.present? %>
+    <div class="alert alert-danger">
+      <%= @wallet_load_error %>
+      <div class="mt-2">
+        <%= button_to "Try load", load_wallet_path(@wallet_name), method: :post,
+                      class: "btn btn-sm btn-primary",
+                      form: { data: { turbo: true, turbo_stream: true } } %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @wallet_info.is_a?(Hash) && @wallet_info["scanning"].present? && @wallet_info["scanning"] != false %>
+    <div class="alert alert-warning border-warning">
+      <div class="d-flex justify-content-between flex-wrap gap-2 align-items-start">
+        <div>
+          <strong>Wallet is rescanning.</strong>
+          <div class="small mt-1 font-monospace">
+            <%= @wallet_info["scanning"].is_a?(Hash) ? @wallet_info["scanning"].to_json : @wallet_info["scanning"].inspect %>
+          </div>
+        </div>
+        <%= button_to "Abort rescan", abort_rescan_wallet_path(@wallet_name), method: :post,
+                      class: "btn btn-sm btn-warning",
+                      form: { data: { turbo: true, turbo_stream: true } },
+                      data: { turbo_confirm: "Abort rescan for #{@wallet_name}?" } %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="alert alert-info small">
+    <strong>No key import on this page.</strong>
+    Create wallets and import keys from
+    <%= link_to "Batch import on /wallets", wallets_path(anchor: "batch-import") %>.
+    This view is for operating and inspecting <code><%= @wallet_name %></code>.
+  </div>
+
+  <div class="card mb-3 shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center py-2">
+      <span class="fw-semibold"><i class="bi bi-terminal me-1"></i> Live log</span>
+      <span class="badge text-bg-dark font-monospace small">wallet · <%= @wallet_name %></span>
+    </div>
+    <div class="card-body py-2" id="wallet_import_log_scroll" style="max-height: 200px; overflow: auto; background: #0d1117;">
+      <div id="wallet_import_log" class="text-light">
+        <%= render "shared/log_status", message: "Ready — scans & RPC for #{@wallet_name} stream here." %>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-xl-5">
+      <%# —— Load ALL HD addresses (gap fill) —— %>
+      <div class="card mb-3 border-warning">
+        <div class="card-header bg-warning">
+          <strong>Load ALL addresses</strong>
+          <span class="badge text-bg-dark ms-1">BIP84 · m/84'/0'/0'/0/0 PRIMARY</span>
+        </div>
+        <div class="card-body">
+          <p class="small text-muted mb-2">
+            <strong>Primary:</strong> <code>m/84'/0'/0'/0/0</code> (native segwit).<br>
+            Receive <code>m/84'/…/0/0…<%= (@receive_gap || 20) - 1 %></code> ·
+            Change <code>m/84'/…/1/0…<%= (@change_gap || 20) - 1 %></code>
+            for every stored zpub/xpub, then UTXO → Postgres.
+          </p>
+          <div class="small mb-3">
+            <div>
+              <strong><%= @extended_keys&.size || 0 %></strong> extended key(s) ·
+              <strong><%= @stored_public_keys_count || 0 %></strong> public key / address row(s) in Postgres
+            </div>
+            <% if @extended_keys.present? %>
+              <ul class="font-monospace text-break mb-2 mt-2">
+                <% @extended_keys.each do |ek| %>
+                  <li>
+                    <%= ek.key_type %> · gap <%= ek.receive_gap %>/<%= ek.change_gap %> ·
+                    <%= truncate(ek.extended_key, length: 36) %>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+            <% if @stored_public_keys.present? %>
+              <details class="mb-0">
+                <summary class="text-muted">Show stored pubkeys/addresses (<%= @stored_public_keys_count %>)</summary>
+                <div class="table-responsive mt-2" style="max-height: 160px; overflow: auto;">
+                  <table class="table table-sm mb-0">
+                    <thead><tr><th>path</th><th>address / pubkey</th></tr></thead>
+                    <tbody>
+                      <% @stored_public_keys.first(100).each do |pk| %>
+                        <tr>
+                          <td class="small"><%= pk.path || "—" %></td>
+                          <td class="font-monospace small text-break">
+                            <%= pk.address.presence || pk.pubkey_hex %>
+                          </td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            <% elsif @extended_keys.blank? %>
+              <div class="alert alert-warning py-2 small mt-2 mb-0">
+                No pubkeys/xpubs stored yet (import was before storage, or only partial).
+                Paste zpub/xpub below <em>or</em> re-run batch import so every pubkey is saved.
+              </div>
+            <% end %>
+          </div>
+
+          <%= form_with url: load_all_addresses_wallet_path(@wallet_name), method: :post,
+                        html: { id: "form-load-all-addrs" },
+                        data: { turbo: true, turbo_stream: true } do %>
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <%= label_tag :receive_gap, "Receive (0/*)", class: "form-label small" %>
+                <%= number_field_tag :receive_gap, @receive_gap || 20, min: 1, max: 200, class: "form-control form-control-sm" %>
+              </div>
+              <div class="col-6">
+                <%= label_tag :change_gap, "Change (1/*)", class: "form-label small" %>
+                <%= number_field_tag :change_gap, @change_gap || 20, min: 1, max: 200, class: "form-control form-control-sm" %>
+              </div>
+            </div>
+            <div class="mb-2">
+              <%= label_tag :extended_keys, "Optional: paste xpub/ypub/zpub if not stored", class: "form-label small" %>
+              <%= text_area_tag :extended_keys, nil, class: "form-control font-monospace form-control-sm", rows: 3,
+                    placeholder: "zpub… / xpub… (only if missing above)" %>
+            </div>
+            <%= hidden_field_tag :auto_utxo_scan, "1" %>
+            <%= submit_tag "Load ALL addresses (full gap) + UTXO scan",
+                  class: "btn btn-warning w-100",
+                  data: {
+                    turbo_confirm: "Import full HD gap (#{@receive_gap || 20} receive + #{@change_gap || 20} change per xpub) into #{@wallet_name} and scan UTXOs?"
+                  } %>
+          <% end %>
+        </div>
+      </div>
+
+      <%# —— Refill private-key script addresses —— %>
+      <div class="card mb-3 border-info">
+        <div class="card-header bg-info text-white">
+          <strong>Refill private keys (BIP84)</strong>
+          <span class="badge text-bg-light text-info ms-1">m/84'/0'/0'/0/0 PRIMARY</span>
+        </div>
+        <div class="card-body">
+          <p class="small text-muted mb-2">
+            <code>dumpprivkey</code> on spendable addresses → treat as BIP32 seed →
+            expand <strong>BIP84</strong>:
+            <code>m/84'/0'/0'/0/0</code>…<code>/0/19</code> (receive) +
+            <code>…/1/0</code>…<code>/1/19</code> (change) = <strong>40 bc1 addresses</strong> per key.
+            Store every pubkey/address, UTXO-scan. WIF never saved to DB.
+          </p>
+          <p class="small mb-3">
+            Pubkeys already in Postgres:
+            <strong>
+              <%= WalletPublicKey.for_wallet(@wallet_name).where(from_private_key: true).select(:pubkey_hex).distinct.count rescue 0 %>
+            </strong>
+            · addresses known:
+            <strong><%= @addresses&.size || 0 %></strong>
+          </p>
+          <%= button_to "Generate pubkeys from wallet private keys + fill scripts + UTXO",
+                        refill_private_keys_wallet_path(@wallet_name),
+                        method: :post,
+                        class: "btn btn-info w-100",
+                        form: { data: { turbo: true, turbo_stream: true } },
+                        data: {
+                          turbo_submits_with: "Working…",
+                          turbo_confirm: "Dump private keys from #{@wallet_name}, generate pubkeys, fill all script types, scan UTXOs? (WIF not saved to DB.)"
+                        } %>
+        </div>
+      </div>
+
+      <%# —— Wallet operations (scan only) —— %>
+      <div class="card mb-3 border-primary">
+        <div class="card-header bg-primary text-white">UTXO scan (this wallet)</div>
+        <div class="card-body">
+          <p class="small text-muted mb-3">
+            This wallet already has keys. Scan the UTXO set for addresses already known here.
+          </p>
+          <div class="d-grid gap-2">
+            <%= button_to "Scan UTXO — spendable (imported privkeys)",
+                          scan_imported_keys_wallet_path(@wallet_name),
+                          method: :post,
+                          class: "btn btn-outline-success",
+                          form: { data: { turbo: true, turbo_stream: true } },
+                          data: { turbo_submits_with: "Scanning…" } %>
+            <%= button_to "Scan UTXO — watch-only",
+                          scan_watch_only_wallet_path(@wallet_name),
+                          method: :post,
+                          class: "btn btn-outline-success",
+                          form: { data: { turbo: true, turbo_stream: true } },
+                          data: { turbo_submits_with: "Scanning…" } %>
+            <%= button_to "Scan UTXO — all known addresses",
+                          scan_utxos_wallet_path(@wallet_name),
+                          method: :post,
+                          class: "btn btn-success",
+                          form: { data: { turbo: true, turbo_stream: true } },
+                          data: { turbo_submits_with: "Scanning…" } %>
+          </div>
+          <hr>
+          <p class="small text-muted mb-0">
+            New keys? <%= link_to "Batch import on index", wallets_path(anchor: "batch-import") %>.
+          </p>
+        </div>
+      </div>
+
+      <div class="card mb-3 border-success">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+          <span>Last UTXO scan result</span>
+          <span class="badge text-bg-light text-success">scantxoutset</span>
+        </div>
+        <div class="card-body">
+          <%= render "utxo_panel", utxo_scan: @utxo_scan %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-7">
+      <div class="card mb-3 shadow-sm border-success">
+        <div class="card-header bg-success text-white fw-semibold">
+          Last balance — every address (Postgres)
+        </div>
+        <div class="card-body">
+          <%= render "stored_balances_panel",
+                stored_balances: @stored_balances || [],
+                stored_balance_total: @stored_balance_total || 0,
+                import_runs: @import_runs || [],
+                wallet_name: @wallet_name %>
+        </div>
+      </div>
+
+      <div class="card mb-3 shadow-sm">
+        <div class="card-header fw-semibold">Metrics · <%= @wallet_name %></div>
+        <div class="card-body">
+          <%= render "status_panel",
+                wallet_name: @wallet_name,
+                wallet_info: @wallet_info,
+                balance: @balance,
+                balances: @balances,
+                wallet_rpc_available: @wallet_rpc_available,
+                loaded_wallets: @loaded_wallets,
+                network: @network %>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span class="fw-semibold">Addresses (last balance)</span>
+          <span class="badge text-bg-secondary" id="wallet_address_count"><%= @addresses&.size || 0 %></span>
+        </div>
+        <div class="card-body p-0">
+          <%= render "addresses_panel", addresses: @addresses || [] %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  function bindWalletPage() {
+    var root = document.getElementById("wallet-page");
+    if (!root || root.dataset.bound === "1") return;
+    root.dataset.bound = "1";
+    var log = document.getElementById("wallet_import_log");
+    var scroll = document.getElementById("wallet_import_log_scroll");
+    if (log && scroll && typeof MutationObserver !== "undefined") {
+      new MutationObserver(function () { scroll.scrollTop = scroll.scrollHeight; })
+        .observe(log, { childList: true, subtree: true });
+    }
+  }
+  document.addEventListener("DOMContentLoaded", bindWalletPage);
+  document.addEventListener("turbo:load", bindWalletPage);
+})();
+</script>

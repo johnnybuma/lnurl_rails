@@ -1,3 +1,5 @@
+@use "bootstrap/scss/bootstrap" as *;
+@import 'bootstrap-icons/font/bootstrap-icons';
 
 $h1-font-size: 1.5rem; // this line was added
 
@@ -13,6 +15,17 @@ $h1-font-size: 1.5rem; // this line was added
 
 #verificationprogress_bar.progress-bar {
   background-color: darkorange;
+}
+
+/* Wallet live log + section cards */
+#wallet_import_log_scroll {
+  scrollbar-color: #484f58 #0d1117;
+}
+#wallet-page .wallet-section-btn.active {
+  box-shadow: inset 0 -2px 0 rgba(255, 255, 255, 0.35);
+}
+#wallet-page .card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05);
 }
 
 .flash-bg {
@@ -209,6 +222,5 @@ tr.items_row > td {
 }
 
 
-@import 'bootstrap/scss/bootstrap';
-@import 'bootstrap-icons/font/bootstrap-icons';
+
 

@@ -1,0 +1,79 @@
+<%# locals: wallet_summaries %>
+<% summaries = local_assigns[:wallet_summaries] || [] %>
+<div id="wallets_table" class="table-responsive">
+  <% if summaries.blank? %>
+    <div class="p-4 text-center text-muted bg-light">
+      No wallets yet. Use <strong>Batch import</strong> above — creates
+      <code>nodeviewWallet01</code> automatically.
+    </div>
+  <% else %>
+    <table class="table table-sm table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Wallet</th>
+          <th>Status</th>
+          <th class="text-end">Balance</th>
+          <th class="text-end">Tx</th>
+          <th>Keys</th>
+          <th>Type</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% summaries.each do |w| %>
+          <tr id="wallet_row_<%= w[:name].to_s.parameterize %>">
+            <td class="font-monospace">
+              <%= link_to w[:name], wallet_path(w[:name]), class: "text-decoration-none" %>
+            </td>
+            <td>
+              <% if w[:error].present? %>
+                <span class="badge text-bg-danger" title="<%= w[:error] %>">error</span>
+              <% elsif w[:scanning] %>
+                <span class="badge text-bg-warning">rescanning</span>
+              <% elsif w[:loaded] %>
+                <span class="badge text-bg-success">loaded</span>
+              <% else %>
+                <span class="badge text-bg-secondary">on disk</span>
+              <% end %>
+            </td>
+            <td class="text-end">
+              <% if w[:balance].nil? %>
+                <span class="text-muted">—</span>
+              <% else %>
+                <strong><%= w[:balance] %></strong>
+                <span class="text-muted small">BTC</span>
+              <% end %>
+            </td>
+            <td class="text-end"><%= w[:txcount].nil? ? "—" : w[:txcount] %></td>
+            <td class="small">
+              <% if w[:private_keys_enabled] == false %>
+                watch-only
+              <% elsif w[:private_keys_enabled] %>
+                private
+              <% else %>
+                —
+              <% end %>
+            </td>
+            <td class="small">
+              <% if w[:descriptors] == true %>
+                descriptor
+              <% elsif w[:descriptors] == false %>
+                legacy
+              <% else %>
+                —
+              <% end %>
+            </td>
+            <td class="text-end text-nowrap">
+              <%= link_to "Open", wallet_path(w[:name]), class: "btn btn-sm btn-primary" %>
+              <% unless w[:loaded] %>
+                <%= button_to "Load", load_wallet_path(w[:name]), method: :post,
+                              class: "btn btn-sm btn-outline-primary",
+                              form: { data: { turbo: true, turbo_stream: true }, class: "d-inline" } %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+</div>
